@@ -13,6 +13,6 @@ public class PasoLineaTiempoDTO {
     private Integer numero;
     private String titulo;
     private String fecha;
-    private String estado;      // "completado", "en-proceso", "pendiente"
+    private String estado; // "completado", "en-proceso", "pendiente"
     private String descripcion;
 }

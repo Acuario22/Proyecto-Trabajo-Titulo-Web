@@ -39,6 +39,10 @@ export interface CrearOrdenTrabajoRequest {
   instrucciones: string;
 }
 
+export interface CerrarReporteRequest {
+  observacionCierreAdmin: string;
+}
+
 export interface OrdenTrabajoResponse {
   idOrden: number;
   idReporte: number;
@@ -53,6 +57,9 @@ export interface OrdenTrabajoResponse {
   materiales?: string;
   instrucciones: string;
   estadoReporte: string;
+  fechaCierreAdmin?: string;
+  observacionCierreAdmin?: string;
+  comentarioCuadrilla?: string;
 }
 
 @Injectable({
@@ -128,5 +135,21 @@ export class ReporteService {
    */
   obtenerOrdenTrabajo(idReporte: number): Observable<OrdenTrabajoResponse> {
     return this.http.get<OrdenTrabajoResponse>(`${this.apiUrl}/${idReporte}/orden-trabajo`);
+  }
+
+  /**
+   * Valida la conformidad de la cuadrilla y finaliza el reporte.
+   * Endpoint: POST /api/reportes/{id}/finalizar
+   */
+  finalizarReporte(idReporte: number, request: CerrarReporteRequest): Observable<OrdenTrabajoResponse> {
+    return this.http.post<OrdenTrabajoResponse>(`${this.apiUrl}/${idReporte}/finalizar`, request);
+  }
+
+  /**
+   * Obtiene la trazabilidad y la línea de tiempo de un reporte.
+   * Endpoint: GET /api/reportes/{identificador}/trazabilidad
+   */
+  obtenerTrazabilidad(identificador: string | number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${identificador}/trazabilidad`);
   }
 }

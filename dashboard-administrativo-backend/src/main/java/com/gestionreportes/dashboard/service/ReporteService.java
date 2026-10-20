@@ -1,5 +1,6 @@
 package com.gestionreportes.dashboard.service;
 
+import com.gestionreportes.dashboard.dto.request.CerrarReporteRequestDTO;
 import com.gestionreportes.dashboard.dto.request.CrearOrdenTrabajoRequestDTO;
 import com.gestionreportes.dashboard.dto.request.CrearReporteRequestDTO;
 import com.gestionreportes.dashboard.dto.response.*;
@@ -27,4 +28,7 @@ public interface ReporteService {
 
     /** Recupera la orden de trabajo asignada a un reporte, o lanza 404 si no tiene. */
     OrdenTrabajoResponseDTO obtenerOrdenTrabajoPorReporte(Integer idReporte);
+
+    /** Valida el trabajo de la cuadrilla, registra la observación administrativa de cierre y pasa a estado FINALIZADO (id 4). */
+    OrdenTrabajoResponseDTO finalizarReporte(Integer idReporte, CerrarReporteRequestDTO request);
 }

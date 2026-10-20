@@ -41,4 +41,18 @@ describe('PanelAdministrativoComponent', () => {
     expect(component.categorias.length).toBe(3);
     expect(component.categoriaSeleccionada).toBe('Todos');
   });
+
+  it('should correctly identify "No iniciado" state', () => {
+    expect(component.esNoIniciado('No iniciado')).toBe(true);
+    expect(component.esNoIniciado('Pendiente')).toBe(true);
+    expect(component.esNoIniciado('Iniciado')).toBe(false);
+    expect(component.esNoIniciado('Finalizado')).toBe(false);
+  });
+
+  it('should correctly identify phases for subsequent states', () => {
+    expect(component.obtenerTipoFase('Iniciado')).toBe('proceso');
+    expect(component.obtenerTipoFase('En Proceso')).toBe('proceso');
+    expect(component.obtenerTipoFase('En revisión')).toBe('revision');
+    expect(component.obtenerTipoFase('Finalizado')).toBe('finalizado');
+  });
 });

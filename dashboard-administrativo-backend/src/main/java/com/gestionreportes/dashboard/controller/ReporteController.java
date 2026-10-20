@@ -1,5 +1,6 @@
 package com.gestionreportes.dashboard.controller;
 
+import com.gestionreportes.dashboard.dto.request.CerrarReporteRequestDTO;
 import com.gestionreportes.dashboard.dto.request.CrearOrdenTrabajoRequestDTO;
 import com.gestionreportes.dashboard.dto.request.CrearReporteRequestDTO;
 import com.gestionreportes.dashboard.dto.response.CategoriaConteoDTO;
@@ -129,5 +130,19 @@ public class ReporteController {
     public ResponseEntity<OrdenTrabajoResponseDTO> obtenerOrdenTrabajo(
             @Parameter(description = "ID numérico (PK) del reporte", example = "1") @PathVariable Integer id) {
         return ResponseEntity.ok(reporteService.obtenerOrdenTrabajoPorReporte(id));
+    }
+
+    /**
+     * POST /api/reportes/{id}/finalizar
+     * Valida el trabajo de la cuadrilla, registra la observación administrativa de cierre
+     * y avanza el reporte al estado FINALIZADO (id 4).
+     */
+    @PostMapping("/{id:[0-9]+}/finalizar")
+    @Operation(summary = "Finalizar reporte y aprobar cierre", description = "Valida el trabajo de la cuadrilla, registra la observación administrativa de cierre en TBLORDENTRABAJO y avanza el reporte a estado FINALIZADO con registro en el historial.")
+    public ResponseEntity<OrdenTrabajoResponseDTO> finalizarReporte(
+            @Parameter(description = "ID numérico (PK) del reporte", example = "1") @PathVariable Integer id,
+            @Valid @RequestBody CerrarReporteRequestDTO request) {
+        OrdenTrabajoResponseDTO orden = reporteService.finalizarReporte(id, request);
+        return ResponseEntity.ok(orden);
     }
 }

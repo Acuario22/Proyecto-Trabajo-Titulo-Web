@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -57,4 +58,14 @@ public class OrdenTrabajoResponseDTO {
 
     @Schema(description = "Estado actual del reporte tras la asignación", example = "Iniciado")
     private String estadoReporte;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "Fecha y hora del cierre administrativo", example = "2026-10-26 16:30:00")
+    private LocalDateTime fechaCierreAdmin;
+
+    @Schema(description = "Observación o dictamen de cierre registrado por el administrador", example = "Se inspeccionó el trabajo de bacheo. Obra conforme.")
+    private String observacionCierreAdmin;
+
+    @Schema(description = "Informe o bitácora técnica ingresada por la cuadrilla al completar el trabajo", example = "Trabajo ejecutado en terreno por Cuadrilla de Obras Viales. Se cumplieron las instrucciones operativas.")
+    private String comentarioCuadrilla;
 }

@@ -7,7 +7,7 @@
     background-color: #f8fafc;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #334155;
-    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 /* Curva de aceleración profesional (estilo Apple / Spring) */
@@ -88,82 +88,12 @@
 }
 
 /* ==========================================================================
-   BARRA SUPERIOR (TOPBAR)
-   ========================================================================== */
-.topbar {
-    background-color: #0b113a;
-    color: #ffffff;
-    padding: 0.9rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    z-index: 10;
-    animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-}
-
-.brand-icon {
-    background-color: #1e255e;
-    padding: 6px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #a5b4fc;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.brand-icon:hover {
-    transform: rotate(8deg) scale(1.08);
-    background-color: #273079;
-}
-
-.brand-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.brand-title {
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-}
-
-.brand-subtitle {
-    font-size: 0.78rem;
-    color: #94a3b8;
-}
-
-/* Indicador de sistema activo con pulso radar */
-.status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    color: #f1f5f9;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #22c55e;
-    border-radius: 50%;
-    animation: radarPulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
-}
-
-/* ==========================================================================
    CONTENEDOR Y ENCABEZADO
    ========================================================================== */
 .dashboard-container {
-    max-width: 1400px;
+    max-width: 1540px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 0.75rem 2rem 3rem;
 }
 
 .page-header {
@@ -727,80 +657,116 @@
     color: #16a34a;
 }
 
-/* Grupo de Acciones en la tabla */
-.actions-group {
+/* ==========================================================================
+   COLUMNA DE ACCIÓN DINÁMICA (GESTIONAR / FASES DE SEGUIMIENTO)
+   ========================================================================== */
+.action-cell {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* Botón Gestionar para estado No iniciado */
+.btn-action-gestionar {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-}
-
-.btn-action-outline {
-    background-color: #ffffff;
-    color: #0077b6;
-    border: 1.5px solid #0077b6;
-    padding: 0.48rem 0.95rem;
-    border-radius: 7px;
-    font-weight: 700;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-action-outline:hover {
-    background-color: #f0f9ff;
-    border-color: #026397;
-    color: #026397;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 119, 182, 0.15);
-}
-
-.btn-action-outline:active {
-    transform: translateY(0);
-}
-
-.btn-action-primary {
-    position: relative;
+    justify-content: center;
+    gap: 7px;
     background-color: #0077b6;
     color: #ffffff;
     border: 1.5px solid #0077b6;
-    padding: 0.48rem 1.05rem;
-    border-radius: 7px;
+    padding: 0.44rem 0.95rem;
+    border-radius: 8px;
     font-weight: 700;
     font-size: 0.82rem;
     cursor: pointer;
-    overflow: hidden;
-    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 119, 182, 0.18);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
 }
 
-/* Efecto de destello de luz al pasar el cursor */
-.btn-action-primary::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(90deg,
-            transparent,
-            rgba(255, 255, 255, 0.25),
-            transparent);
-    transform: skewX(-20deg);
-}
-
-.btn-action-primary:hover {
+.btn-action-gestionar:hover {
     background-color: #026397;
     border-color: #026397;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 119, 182, 0.35);
 }
 
-.btn-action-primary:hover::after {
-    animation: buttonShimmer 0.75s ease-in-out;
+.btn-action-gestionar:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 119, 182, 0.2);
 }
 
-.btn-action-primary:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 119, 182, 0.2);
+.btn-action-icon {
+    flex-shrink: 0;
+}
+
+/* Botón circular de fase (38x38px, centrado y con animación suave al hacer hover) */
+.btn-phase-circle {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 auto;
+    border: 1.5px solid transparent;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Fase 2: "Iniciado" o "En Proceso" - Círculo azul */
+.btn-phase-circle.phase-proceso {
+    background-color: #e0f2fe;
+    color: #0284c7;
+    border-color: #bae6fd;
+}
+
+.btn-phase-circle.phase-proceso:hover {
+    background-color: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+    transform: translateY(-2px) scale(1.08);
+    box-shadow: 0 6px 14px -2px rgba(2, 132, 199, 0.45);
+}
+
+/* Fase 3: "En revisión" - Círculo ámbar */
+.btn-phase-circle.phase-revision {
+    background-color: #fef3c7;
+    color: #d97706;
+    border-color: #fde68a;
+}
+
+.btn-phase-circle.phase-revision:hover {
+    background-color: #d97706;
+    color: #ffffff;
+    border-color: #d97706;
+    transform: translateY(-2px) scale(1.08);
+    box-shadow: 0 6px 14px -2px rgba(217, 119, 6, 0.45);
+}
+
+/* Fase 4: "Finalizado" - Círculo verde */
+.btn-phase-circle.phase-finalizado {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border-color: #bbf7d0;
+}
+
+.btn-phase-circle.phase-finalizado:hover {
+    background-color: #16a34a;
+    color: #ffffff;
+    border-color: #16a34a;
+    transform: translateY(-2px) scale(1.08);
+    box-shadow: 0 6px 14px -2px rgba(22, 163, 74, 0.45);
+}
+
+.btn-phase-circle:active {
+    transform: scale(0.96);
 }
 
 /* Pie de la tabla */

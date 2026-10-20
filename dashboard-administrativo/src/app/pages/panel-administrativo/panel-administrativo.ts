@@ -8,6 +8,8 @@ import {
   DashboardMetricas
 } from '../../core/services/reporte.service';
 
+import { HeaderComponent } from '../../shared/components/header/header';
+
 // Constantes y tipos para Urgencia y Sentimiento (mantenidos para retrocompatibilidad con vistas hijas)
 export const URGENCIAS = ['Baja', 'Media', 'Alta'] as const;
 export type Urgencia = typeof URGENCIAS[number];
@@ -21,7 +23,7 @@ export type { Reporte };
 @Component({
   selector: 'app-panel-administrativo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HeaderComponent],
   templateUrl: './panel-administrativo.html',
   styleUrl: './panel-administrativo.css'
 })
@@ -194,13 +196,45 @@ export class PanelAdministrativoComponent implements OnInit {
     }
   }
 
-  // Acción para el botón de seguimiento
-  verSeguimiento(codigo: string): void {
-    this.router.navigate(['/trazabilidad-reporte'], { queryParams: { codigo } });
+  /**
+   * Determina si el reporte se encuentra en Fase 1 ("No iniciado").
+   */
+  esNoIniciado(estado?: string): boolean {
+    if (!estado) return true;
+    const e = estado.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return e === 'no iniciado' || e === 'pendiente';
   }
 
-  // Acción para el botón de gestión
+  /**
+   * Clasifica la fase para estados posteriores:
+   * - 'proceso': "Iniciado" o "En Proceso" (icono de reloj azul)
+   * - 'revision': "En revisión" (icono de lupa ámbar)
+   * - 'finalizado': "Finalizado" (icono de check verde)
+   */
+  obtenerTipoFase(estado?: string): 'proceso' | 'revision' | 'finalizado' {
+    if (!estado) return 'proceso';
+    const e = estado.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (e.includes('finalizado') || e.includes('resuelto') || e.includes('completado')) {
+      return 'finalizado';
+    }
+    if (e.includes('revision')) {
+      return 'revision';
+    }
+    return 'proceso';
+  }
+
+  // Acción para el botón de seguimiento (navega a /seguimiento/:id)
+  verSeguimiento(id: number | string, codigo?: string): void {
+    this.router.navigate(['/seguimiento', id], { queryParams: { codigo } });
+  }
+
+  // Acción para el botón de gestión (navega a /gestionar/:id)
   gestionarReporte(id: number | string, codigo?: string): void {
-    this.router.navigate(['/gestionar-reporte', id], { queryParams: { codigo } });
+    this.router.navigate(['/gestionar', id], { queryParams: { codigo } });
+  }
+
+  // Acción para el botón de revisión y cierre (navega a /revisar/:id)
+  irARevision(id: number | string, codigo?: string): void {
+    this.router.navigate(['/revisar', id], { queryParams: { codigo } });
   }
 }

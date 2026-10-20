@@ -1,16 +1,7 @@
-<!-- Barra Superior (Navbar con navegación de retorno) -->
-<header class="topbar">
-  <div class="topbar-content">
-    <button class="btn-back" (click)="volverAlPanel()" type="button" aria-label="Volver al panel principal">
-      <svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
-      </svg>
-      <span>Volver al panel</span>
-    </button>
-    <span class="topbar-divider">·</span>
-    <h1 class="topbar-title">Trazabilidad del Reporte</h1>
-  </div>
-</header>
+<!-- Barra Superior Cápsula Flotante Reutilizable -->
+<app-header [mostrarVolver]="true" titulo="Trazabilidad del Reporte" subtitulo="Seguimiento y fases"
+  [mostrarEstado]="true" (volver)="volverAlPanel()">
+</app-header>
 
 <!-- Contenedor Principal de la Vista de Trazabilidad -->
 <main class="trazabilidad-container">
@@ -37,7 +28,8 @@
     </div>
 
     <div class="report-meta">
-      <svg class="meta-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="meta-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -57,7 +49,7 @@
   <!-- Tarjeta con la Línea de Tiempo Horizontal / Stepper -->
   <section class="timeline-card">
     <div class="stepper-wrapper">
-      
+
       <!-- Línea conectora base -->
       <div class="timeline-line-background">
         <div class="timeline-line-active"></div>
@@ -66,44 +58,47 @@
       <!-- Pasos del proceso -->
       <div class="timeline-steps">
         @for (paso of pasos; track paso.numero) {
-          <div class="timeline-step" [ngClass]="paso.estado">
-            
-            <!-- Nodo circular del paso -->
-            <div class="step-node-wrapper">
-              <div class="step-node">
-                @if (paso.numero === 1) {
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
-                  </svg>
-                } @else if (paso.numero === 2) {
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <polyline points="12 7 12 12 15 14"></polyline>
-                  </svg>
-                } @else {
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <polyline points="8.5 12 11 14.5 15.5 9.5"></polyline>
-                  </svg>
-                }
-              </div>
-            </div>
+        <div class="timeline-step" [ngClass]="paso.estado">
 
-            <!-- Información del paso -->
-            <div class="step-info">
-              <span class="step-title">{{ paso.titulo }}</span>
-              @if (paso.fecha) {
-                <span class="step-date">{{ paso.fecha }}</span>
+          <!-- Nodo circular del paso -->
+          <div class="step-node-wrapper">
+            <div class="step-node">
+              @if (paso.numero === 1) {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+              </svg>
+              } @else if (paso.numero === 2) {
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <polyline points="12 7 12 12 15 14"></polyline>
+              </svg>
+              } @else {
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <polyline points="8.5 12 11 14.5 15.5 9.5"></polyline>
+              </svg>
               }
             </div>
-
-            <!-- Tarjeta de detalle de estado -->
-            <div class="step-card-box">
-              <p>{{ paso.descripcion }}</p>
-            </div>
-
           </div>
+
+          <!-- Información del paso -->
+          <div class="step-info">
+            <span class="step-title">{{ paso.titulo }}</span>
+            @if (paso.fecha) {
+            <span class="step-date">{{ paso.fecha }}</span>
+            }
+          </div>
+
+          <!-- Tarjeta de detalle de estado -->
+          <div class="step-card-box">
+            <p>{{ paso.descripcion }}</p>
+          </div>
+
+        </div>
         }
       </div>
 
@@ -111,17 +106,34 @@
   </section>
 
   <!-- Banner Informativo del Estado Actual -->
-  <aside class="status-banner">
-    <div class="banner-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"></circle>
-        <polyline points="12 7 12 12 15 14"></polyline>
-      </svg>
+  <aside class="status-banner" [class.banner-revision]="esEnRevision()">
+    <div class="banner-left">
+      <div class="banner-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"></circle>
+          <polyline points="12 7 12 12 15 14"></polyline>
+        </svg>
+      </div>
+      <div class="banner-text">
+        <h4 class="banner-title">Estado actual: {{ reporte.estadoActual }}</h4>
+        <p class="banner-subtitle">{{ reporte.detalleEstadoActual }}</p>
+      </div>
     </div>
-    <div class="banner-text">
-      <h4 class="banner-title">Estado actual: {{ reporte.estadoActual }}</h4>
-      <p class="banner-subtitle">{{ reporte.detalleEstadoActual }}</p>
+
+    @if (esEnRevision()) {
+    <div class="banner-action">
+      <button type="button" class="btn-ir-revision" (click)="irARevision()"
+        title="Ir a validar trabajo y cerrar reporte">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Ir a revisión y cierre</span>
+      </button>
     </div>
+    }
   </aside>
 
 </main>

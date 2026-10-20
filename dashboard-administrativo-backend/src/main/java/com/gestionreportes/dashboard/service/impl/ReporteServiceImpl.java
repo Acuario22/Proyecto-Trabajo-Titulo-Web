@@ -1,5 +1,6 @@
 package com.gestionreportes.dashboard.service.impl;
 
+import com.gestionreportes.dashboard.dto.request.CerrarReporteRequestDTO;
 import com.gestionreportes.dashboard.dto.request.CrearOrdenTrabajoRequestDTO;
 import com.gestionreportes.dashboard.dto.request.CrearReporteRequestDTO;
 import com.gestionreportes.dashboard.dto.response.*;
@@ -198,7 +199,8 @@ public class ReporteServiceImpl implements ReporteService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Reporte no encontrado con ID: " + idReporte));
 
-        // Buscar si ya existe una orden de trabajo previa para este reporte (actualizar o crear)
+        // Buscar si ya existe una orden de trabajo previa para este reporte (actualizar
+        // o crear)
         OrdenTrabajo ordenTrabajo = ordenTrabajoRepository.findByReporte_IdReporte(idReporte)
                 .orElseGet(() -> OrdenTrabajo.builder()
                         .reporte(reporte)
@@ -206,7 +208,8 @@ public class ReporteServiceImpl implements ReporteService {
 
         ordenTrabajo.setCuadrilla(request.getCuadrilla());
         ordenTrabajo.setResponsable(request.getResponsable());
-        ordenTrabajo.setCantidadPersonal(request.getCantidadPersonal() != null ? request.getCantidadPersonal().shortValue() : 1);
+        ordenTrabajo.setCantidadPersonal(
+                request.getCantidadPersonal() != null ? request.getCantidadPersonal().shortValue() : 1);
         ordenTrabajo.setVehiculo(request.getVehiculo());
         ordenTrabajo.setFechaVisita(request.getFechaVisita());
         ordenTrabajo.setHoraVisita(request.getHoraVisita());
@@ -230,7 +233,8 @@ public class ReporteServiceImpl implements ReporteService {
                 .reporte(reporte)
                 .estado(estadoIniciado)
                 .fechaCambio(LocalDateTime.now())
-                .observacion("Orden de trabajo asignada a " + request.getCuadrilla() + " - Responsable: " + request.getResponsable())
+                .observacion("Orden de trabajo asignada a " + request.getCuadrilla() + " - Responsable: "
+                        + request.getResponsable())
                 .build();
         historialReporteRepository.save(nuevoHistorial);
 
@@ -250,6 +254,77 @@ public class ReporteServiceImpl implements ReporteService {
         return mapearAOrdenTrabajoDTO(ordenTrabajo, reporte);
     }
 
+    @Override
+    @Transactional
+    public OrdenTrabajoResponseDTO finalizarReporte(Integer idReporte, CerrarReporteRequestDTO request) {
+        // a) Buscar el reporte por idReporte
+        Reporte reporte = reporteRepository.findById(idReporte)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Reporte no encontrado con ID: " + idReporte));
+
+        // b) Buscar la orden de trabajo asociada en TBLORDENTRABAJO y registrar cierre
+        OrdenTrabajo ordenTrabajo = ordenTrabajoRepository.findByReporte_IdReporte(idReporte)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "No existe una orden de trabajo asociada al reporte ID: " + idReporte));
+
+        ordenTrabajo.setFechaCierreAdmin(LocalDateTime.now());
+        ordenTrabajo.setObservacionCierreAdmin(request.getObservacionCierreAdmin());
+        OrdenTrabajo guardada = ordenTrabajoRepository.save(ordenTrabajo);
+
+        // c) Si el reporte aún no tenía un hito de estado 3 (EN REVISION) en
+        // TBLHISTORIAL, insertarlo primero
+        List<HistorialReporte> historial = historialReporteRepository.findByReporteIdOrderByFechaCambioAsc(idReporte);
+        boolean tieneEstadoRevision = historial.stream()
+                .anyMatch(h -> h.getEstado() != null && (Integer.valueOf(3).equals(h.getEstado().getIdEstado())
+                        || "EN REVISION".equalsIgnoreCase(h.getEstado().getNombre())
+                        || "EN REVISIÓN".equalsIgnoreCase(h.getEstado().getNombre())));
+
+        if (!tieneEstadoRevision) {
+            EstadoReporte estadoRevision = estadoReporteRepository.findById(3)
+                    .orElseGet(() -> estadoReporteRepository.findByNombreIgnoreCase("EN REVISION")
+                            .orElseGet(() -> estadoReporteRepository.findByNombreIgnoreCase("EN REVISIÓN")
+                                    .orElseGet(() -> estadoReporteRepository.findByNombreIgnoreCase("EN PROCESO")
+                                            .orElse(null))));
+
+            if (estadoRevision != null) {
+                String cuad = guardada.getCuadrilla() != null ? guardada.getCuadrilla() : "Cuadrilla asignada";
+                String resp = guardada.getResponsable() != null ? guardada.getResponsable() : "Responsable";
+                String comentarioCuadrilla = "Trabajo ejecutado en terreno por " + cuad + " a cargo de " + resp
+                        + ". Se cumplieron las instrucciones operativas y la zona quedó habilitada.";
+
+                HistorialReporte hRev = HistorialReporte.builder()
+                        .reporte(reporte)
+                        .estado(estadoRevision)
+                        .fechaCambio(LocalDateTime.now().minusMinutes(5))
+                        .observacion(comentarioCuadrilla)
+                        .build();
+                historialReporteRepository.save(hRev);
+            }
+        }
+
+        // d) Actualizar el estado del reporte en TBLREPORTES a ID_ESTADO = 4
+        // (FINALIZADO)
+        EstadoReporte estadoFinalizado = estadoReporteRepository.findById(4)
+                .orElseGet(() -> estadoReporteRepository.findByNombreIgnoreCase("FINALIZADO")
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                                "Estado 'FINALIZADO' no encontrado en el sistema")));
+
+        reporte.setEstado(estadoFinalizado);
+        reporteRepository.save(reporte);
+
+        // e) Insertar el registro final en TBLHISTORIAL
+        HistorialReporte hFinal = HistorialReporte.builder()
+                .reporte(reporte)
+                .estado(estadoFinalizado)
+                .fechaCambio(LocalDateTime.now())
+                .observacion("Cierre aprobado por administración: " + request.getObservacionCierreAdmin())
+                .build();
+        historialReporteRepository.save(hFinal);
+
+        // f) Retornar DTO de la orden actualizada
+        return mapearAOrdenTrabajoDTO(guardada, reporte);
+    }
+
     private OrdenTrabajoResponseDTO mapearAOrdenTrabajoDTO(OrdenTrabajo orden, Reporte reporte) {
         String estadoNombre = (reporte != null && reporte.getEstado() != null)
                 ? formatearCapital(reporte.getEstado().getNombre())
@@ -259,6 +334,28 @@ public class ReporteServiceImpl implements ReporteService {
 
         Integer idRep = reporte != null ? reporte.getIdReporte()
                 : (orden.getReporte() != null ? orden.getReporte().getIdReporte() : null);
+
+        // Buscar comentario de cuadrilla en TBLHISTORIAL con ID_ESTADO = 3
+        String comentarioCuadrilla = null;
+        if (idRep != null) {
+            List<HistorialReporte> hist = historialReporteRepository.findByReporteIdOrderByFechaCambioAsc(idRep);
+            comentarioCuadrilla = hist.stream()
+                    .filter(h -> h.getEstado() != null && (Integer.valueOf(3).equals(h.getEstado().getIdEstado())
+                            || "EN REVISION".equalsIgnoreCase(h.getEstado().getNombre())
+                            || "EN REVISIÓN".equalsIgnoreCase(h.getEstado().getNombre())
+                            || "EN PROCESO".equalsIgnoreCase(h.getEstado().getNombre())))
+                    .map(HistorialReporte::getObservacion)
+                    .filter(obs -> obs != null && !obs.isBlank())
+                    .reduce((first, second) -> second)
+                    .orElse(null);
+        }
+
+        if (comentarioCuadrilla == null || comentarioCuadrilla.isBlank()) {
+            String cuad = orden.getCuadrilla() != null ? orden.getCuadrilla() : "la Cuadrilla de Operaciones";
+            String resp = orden.getResponsable() != null ? orden.getResponsable() : "el Encargado Técnico";
+            comentarioCuadrilla = "Trabajo ejecutado en terreno por " + cuad + " a cargo de " + resp
+                    + ". Se cumplieron las instrucciones operativas y la zona quedó habilitada.";
+        }
 
         return OrdenTrabajoResponseDTO.builder()
                 .idOrden(orden.getIdOrden())
@@ -274,6 +371,9 @@ public class ReporteServiceImpl implements ReporteService {
                 .materiales(orden.getMateriales())
                 .instrucciones(orden.getInstrucciones())
                 .estadoReporte(estadoNombre)
+                .fechaCierreAdmin(orden.getFechaCierreAdmin())
+                .observacionCierreAdmin(orden.getObservacionCierreAdmin())
+                .comentarioCuadrilla(comentarioCuadrilla)
                 .build();
     }
 

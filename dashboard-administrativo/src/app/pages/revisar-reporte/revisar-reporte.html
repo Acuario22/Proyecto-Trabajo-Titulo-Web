@@ -1,0 +1,352 @@
+<!-- Barra Superior Cápsula Flotante Reutilizable -->
+<app-header 
+  [mostrarVolver]="true" 
+  titulo="Revisión de reporte" 
+  subtitulo="Validación técnica y cierre"
+  perfilTexto="Perfil administrador"
+  [mostrarEstado]="false"
+  (volver)="volverAlPanel()">
+</app-header>
+
+<!-- Contenedor Principal de la Vista Revisar Reporte -->
+<main class="revision-container">
+
+  <!-- Alerta de éxito al finalizar el reporte -->
+  @if (mensajeExito) {
+    <div class="alert-success">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <div>
+        <strong>¡Operación exitosa!</strong>
+        <p>{{ mensajeExito }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Alerta de error -->
+  @if (mensajeError) {
+    <div class="alert-error">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <div>
+        <strong>Atención:</strong>
+        <p>{{ mensajeError }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Encabezado de Página -->
+  <section class="page-heading">
+    <div class="page-heading-left">
+      <span class="sub-category-tag">VALIDACIÓN DE TRABAJO EN TERRENO</span>
+      <h2 class="page-main-title">Revisión de reporte</h2>
+      <p class="page-main-subtitle">Verifica el informe de la cuadrilla y aprueba el cierre definitivo de la incidencia.</p>
+    </div>
+    <div class="page-heading-right">
+      <span class="code-badge">{{ reporte.codigo }}</span>
+    </div>
+  </section>
+
+  <!-- Layout de Dos Columnas: Contenido Principal y Sidebar -->
+  <div class="revision-layout">
+
+    <!-- Columna Principal (Izquierda) -->
+    <div class="main-column">
+
+      <!-- Tarjeta 1: Resumen de Incidencia y Orden de Trabajo (Solo Lectura) -->
+      <section class="card incident-card">
+        <div class="incident-card-header">
+          <div class="incident-tags">
+            <span class="tag-category">{{ reporte.categoria || 'Sin Categoría' }}</span>
+            <span class="tag-urgency" [ngClass]="obtenerClaseUrgencia(reporte.urgencia)">
+              {{ reporte.urgencia }}
+            </span>
+          </div>
+          <div class="status-box-amber">
+            <span class="status-dot-amber"></span>
+            <span class="status-box-value">{{ reporte.estado || 'En revisión' }}</span>
+          </div>
+        </div>
+
+        <h3 class="incident-card-title">Incidencia reportada</h3>
+        <p class="incident-card-desc">{{ reporte.texto || 'Sin descripción disponible.' }}</p>
+
+        <!-- Bloque Estilizado de la Orden de Trabajo Vinculada -->
+        <div class="order-summary-box">
+          <div class="order-summary-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span class="order-summary-title">Orden de Trabajo #{{ orden.idOrden || 'N/A' }} · Parámetros de intervención</span>
+          </div>
+
+          <div class="order-details-grid">
+            <div class="order-detail-item">
+              <span class="detail-label">Cuadrilla asignada</span>
+              <span class="detail-value highlight">{{ orden.cuadrilla }}</span>
+            </div>
+
+            <div class="order-detail-item">
+              <span class="detail-label">Responsable</span>
+              <span class="detail-value">{{ orden.responsable }}</span>
+            </div>
+
+            <div class="order-detail-item">
+              <span class="detail-label">Personal y Vehículo</span>
+              <span class="detail-value">{{ orden.cantidadPersonal }} operarios · {{ orden.vehiculo || 'Sin vehículo' }}</span>
+            </div>
+
+            <div class="order-detail-item">
+              <span class="detail-label">Visita y Duración</span>
+              <span class="detail-value">{{ orden.fechaVisita || 'Programada' }} a las {{ orden.horaVisita || '--:--' }} ({{ orden.duracionEstimada }})</span>
+            </div>
+
+            <div class="order-detail-item full-width">
+              <span class="detail-label">Materiales e insumos</span>
+              <span class="detail-value">{{ orden.materiales || 'No especificados en la orden' }}</span>
+            </div>
+
+            <div class="order-detail-item full-width">
+              <span class="detail-label">Instrucciones originales</span>
+              <span class="detail-value instructions-quote">{{ orden.instrucciones }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bloque Numerado (1): Informe Técnico de la Cuadrilla -->
+      <section class="card section-card">
+        <div class="section-title-row">
+          <span class="step-circle">1</span>
+          <div>
+            <h4 class="section-title">Informe técnico de la cuadrilla</h4>
+            <p class="section-subtitle">Bitácora de faena reportada por el personal operativo en terreno.</p>
+          </div>
+        </div>
+
+        <div class="crew-report-box">
+          <div class="crew-header-row">
+            <div class="crew-identity">
+              <div class="helmet-icon-box">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a8 8 0 0 0-8-8h-4a8 8 0 0 0-8 8v2z"></path>
+                  <path d="M10 10V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"></path>
+                  <line x1="4" y1="15" x2="20" y2="15"></line>
+                </svg>
+              </div>
+              <div class="crew-names">
+                <span class="crew-responsible">{{ orden.responsable }}</span>
+                <span class="crew-unit">{{ orden.cuadrilla }}</span>
+              </div>
+            </div>
+            <span class="crew-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Trabajo finalizado en terreno
+            </span>
+          </div>
+
+          <div class="crew-commentary">
+            <p>{{ orden.comentarioCuadrilla }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bloque Numerado (2): Evidencia de Terreno -->
+      <section class="card section-card">
+        <div class="section-title-row">
+          <span class="step-circle">2</span>
+          <div>
+            <h4 class="section-title">Evidencia de terreno</h4>
+            <p class="section-subtitle">Compara el estado del lugar antes y después de la intervención técnica.</p>
+          </div>
+        </div>
+
+        <div class="evidence-grid">
+          
+          <!-- Tarjeta 1: ANTES -->
+          <div class="evidence-card evidence-before">
+            <div class="evidence-tag before-tag">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>ANTES · DAÑO REPORTADO</span>
+            </div>
+          </div>
+
+          <!-- Tarjeta 2: DESPUÉS -->
+          <div class="evidence-card evidence-after">
+            <div class="evidence-tag after-tag">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>DESPUÉS · OBRA EJECUTADA</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Bloque Numerado (3): Conformidad y Cierre Administrativo -->
+      <section class="card section-card">
+        <form (ngSubmit)="finalizarReporte()">
+          <div class="section-title-row">
+            <span class="step-circle">3</span>
+            <div>
+              <h4 class="section-title">Conformidad y cierre administrativo</h4>
+              <p class="section-subtitle">Confirma la validación del trabajo realizado para concluir el ciclo del reporte.</p>
+            </div>
+          </div>
+
+          <!-- Casillas de verificación obligatorias -->
+          <div class="checklist-group">
+            <label class="checkbox-container">
+              <input type="checkbox" [(ngModel)]="checkInstruccionesConformes" name="checkInstruccionesConformes">
+              <span class="checkmark"></span>
+              <span class="checkbox-label-text">
+                <strong>Trabajo ejecutado en terreno conforme a las instrucciones de la orden</strong>
+                <span class="checkbox-desc">Se verificó el cumplimiento de especificaciones técnicas, materiales y protocolo de seguridad.</span>
+              </span>
+            </label>
+
+            <label class="checkbox-container">
+              <input type="checkbox" [(ngModel)]="checkEvidenciasVerificadas" name="checkEvidenciasVerificadas">
+              <span class="checkmark"></span>
+              <span class="checkbox-label-text">
+                <strong>Evidencia técnica y habilitación de la zona verificadas</strong>
+                <span class="checkbox-desc">Las fotografías adjuntas certifican la reparación íntegra del lugar y el tránsito normal.</span>
+              </span>
+            </label>
+          </div>
+
+          <!-- Campo de Observación de Cierre Administrativo -->
+          <div class="form-group mb-4">
+            <label class="form-label" for="observacionCierreAdmin">
+              Observación de cierre administrativo <span class="required">*</span>
+            </label>
+            <textarea 
+              id="observacionCierreAdmin" 
+              rows="4" 
+              class="form-control textarea-control" 
+              placeholder="Ej. Se realiza inspección visual en terreno. Obra de bacheo ejecutada satisfactoriamente según el estándar municipal. Calzada habilitada al tránsito vehicular sin observaciones..." 
+              [(ngModel)]="observacionCierreAdmin" 
+              name="observacionCierreAdmin" 
+              maxlength="500"
+              required>
+            </textarea>
+            <div class="textarea-counter">
+              <span>{{ 500 - (observacionCierreAdmin.length || 0) }} caracteres disponibles</span>
+            </div>
+          </div>
+
+          <!-- Barra Inferior de Acciones -->
+          <footer class="form-card-footer">
+            <span class="footer-note">Se registrará el cierre en TBLORDENTRABAJO y el reporte pasará a estado Finalizado</span>
+            <div class="footer-buttons">
+              <button type="button" class="btn-cancel" (click)="volverAlPanel()" [disabled]="guardandoCierre">
+                Cancelar
+              </button>
+              <button 
+                type="submit" 
+                class="btn-finalize" 
+                [disabled]="!formularioValido || guardandoCierre"
+                title="Aprobar y finalizar el reporte ciudadano">
+                @if (guardandoCierre) {
+                  <span class="spinner-inline"></span>
+                  <span>Finalizando reporte...</span>
+                } @else {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Aprobar y finalizar reporte</span>
+                }
+              </button>
+            </div>
+          </footer>
+        </form>
+      </section>
+
+    </div>
+
+    <!-- Columna Lateral (Derecha) -->
+    <aside class="sidebar-column">
+
+      <!-- Tarjeta 1: Ubicación del reporte -->
+      <section class="side-card">
+        <h4 class="side-card-title">Ubicación del reporte</h4>
+        
+        <div class="location-box">
+          <div class="location-header-row">
+            <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span class="location-tag">DIRECCIÓN REGISTRADA</span>
+          </div>
+          <span class="location-address">{{ reporte.direccion || 'Sin dirección registrada' }}</span>
+        </div>
+
+        <button type="button" class="btn-map" (click)="verEnMapa()">
+          Ver ubicación en mapa
+        </button>
+      </section>
+
+      <!-- Tarjeta 2: Flujo de resolución -->
+      <section class="side-card">
+        <h4 class="side-card-title">Flujo de resolución</h4>
+
+        <div class="resolution-flow">
+          <!-- Paso 1: Asignación (Completado) -->
+          <div class="flow-step completed">
+            <div class="flow-step-header">
+              <span class="flow-step-icon completed-check">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              <span class="flow-step-num">01</span>
+              <span class="flow-step-name">Asignación</span>
+            </div>
+            <p class="flow-step-desc">Cuadrilla asignada y visita programada</p>
+          </div>
+
+          <!-- Paso 2: Atención (Completado) -->
+          <div class="flow-step completed">
+            <div class="flow-step-header">
+              <span class="flow-step-icon completed-check">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              <span class="flow-step-num">02</span>
+              <span class="flow-step-name">Atención</span>
+            </div>
+            <p class="flow-step-desc">Trabajo en terreno ejecutado con evidencias</p>
+          </div>
+
+          <!-- Paso 3: Cierre (Activo / En proceso de validación) -->
+          <div class="flow-step active-blue">
+            <div class="flow-step-header">
+              <span class="flow-step-num">03</span>
+              <span class="flow-step-name">Cierre</span>
+            </div>
+            <p class="flow-step-desc">Validar solución y finalizar reporte</p>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+  </div>
+
+</main>

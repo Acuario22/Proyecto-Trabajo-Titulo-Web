@@ -20,10 +20,12 @@ export interface OrdenTrabajoFormModel {
   instrucciones: string;
 }
 
+import { HeaderComponent } from '../../shared/components/header/header';
+
 @Component({
   selector: 'app-gestionar-reporte',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent],
   templateUrl: './gestionar-reporte.html',
   styleUrl: './gestionar-reporte.css'
 })
@@ -107,6 +109,16 @@ export class GestionarReporteComponent implements OnInit {
     this.cargandoReporte = true;
     this.reporteService.obtenerReportePorId(id).subscribe({
       next: (rep) => {
+        // SEGURIDAD: Si el reporte ya no se encuentra en estado "No iniciado",
+        // redirigir automáticamente a la vista de seguimiento/trazabilidad.
+        if (!this.esEstadoNoIniciado(rep.estado)) {
+          console.warn(`Seguridad: El reporte ${rep.codigo} (ID: ${rep.id}) ya está en estado "${rep.estado}". Redirigiendo a seguimiento.`);
+          this.router.navigate(['/seguimiento', rep.id], {
+            queryParams: { codigo: rep.codigo }
+          });
+          return;
+        }
+
         this.reporte = rep;
         this.cargandoReporte = false;
         this.cdr.markForCheck();
@@ -118,6 +130,12 @@ export class GestionarReporteComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  esEstadoNoIniciado(estado?: string): boolean {
+    if (!estado) return true;
+    const e = estado.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return e === 'no iniciado' || e === 'pendiente';
   }
 
   cargarOrdenExistente(id: number): void {

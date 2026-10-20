@@ -1,0 +1,257 @@
+/* ==========================================================================
+   CONFIGURACIÓN HOST Y WRAPPER STICKY
+   ========================================================================== */
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  pointer-events: none;
+}
+
+.topbar-wrapper {
+  position: relative;
+  width: 100%;
+  padding: 0.85rem 0 0.65rem;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   ZONA SUPERIOR DE DESENFOQUE (BLUR / DEFUMINADO EN EL ESPACIO SUPERIOR)
+   Efecto de desenfoque y desvanecimiento suave para que el contenido
+   que sube por detrás quede completamente difuminado en el margen superior.
+   ========================================================================== */
+.topbar-blur-zone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(100% + 8px);
+  pointer-events: none;
+  z-index: 1;
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  background: linear-gradient(
+    to bottom,
+    rgba(248, 250, 252, 0.96) 0%,
+    rgba(248, 250, 252, 0.85) 45%,
+    rgba(248, 250, 252, 0.25) 85%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 100%);
+}
+
+/* ==========================================================================
+   CÁPSULA PRINCIPAL FLOTANTE (100% OPACIDAD SÓLIDA, ELEVADA Y SIMÉTRICA)
+   ========================================================================== */
+.topbar-capsule {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  width: calc(100% - 3rem);
+  max-width: 1580px;
+  margin: 0 auto;
+  background: #0b113a; /* 100% Sólido sin transparencia */
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  padding: 0.72rem 1.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  box-shadow: 0 14px 34px -4px rgba(11, 17, 58, 0.38),
+              0 4px 14px rgba(0, 0, 0, 0.22),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.16);
+  transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideDownCapsule 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.topbar-capsule:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 18px 42px -4px rgba(11, 17, 58, 0.45),
+              0 6px 18px rgba(0, 0, 0, 0.28),
+              inset 0 1px 2px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* ==========================================================================
+   LADO IZQUIERDO: MARCA O NAVEGACIÓN DE RETORNO + TÍTULO
+   ========================================================================== */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.brand-icon {
+  background-color: rgba(30, 37, 94, 0.85);
+  border: 1px solid rgba(165, 180, 252, 0.25);
+  padding: 7px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a5b4fc;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.brand-icon:hover {
+  transform: rotate(8deg) scale(1.08);
+  background-color: rgba(39, 48, 121, 0.95);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: #ffffff;
+}
+
+.brand-subtitle {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  letter-spacing: 0.2px;
+}
+
+/* Botón de volver para vistas operativas y de detalle */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.btn-back:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(-2px);
+}
+
+.chevron-icon {
+  transition: transform 0.25s ease;
+}
+
+.btn-back:hover .chevron-icon {
+  transform: translateX(-2px);
+}
+
+.topbar-divider {
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   LADO DERECHO: ACCIONES, PERFIL Y ESTADO
+   ========================================================================== */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.profile-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.38rem 0.85rem;
+  border-radius: 9999px;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  transition: background-color 0.25s ease;
+}
+
+.status-indicator:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  animation: radarPulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* ==========================================================================
+   ANIMACIONES
+   ========================================================================== */
+@keyframes slideDownCapsule {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes radarPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVIDAD
+   ========================================================================== */
+@media (max-width: 768px) {
+  .topbar-wrapper {
+    padding: 0.5rem 0 0.5rem;
+  }
+
+  .topbar-capsule {
+    width: calc(100% - 1.25rem);
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .brand-title {
+    font-size: 0.88rem;
+  }
+}
