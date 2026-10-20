@@ -1,0 +1,229 @@
+<!-- Barra Superior (Navbar de la Plataforma) -->
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z" />
+            </svg>
+        </div>
+        <div class="brand-text">
+            <span class="brand-title">Municipalidad · Plataforma Urbana</span>
+            <span class="brand-subtitle">Gestión de Reportes Urbanos</span>
+        </div>
+    </div>
+
+    <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span class="status-text">Sistema activo</span>
+    </div>
+</header>
+
+<!-- Contenedor Principal del Dashboard -->
+<main class="dashboard-container">
+
+    <!-- Encabezado de Página -->
+    <section class="page-header">
+        <h1 class="page-title">Panel de Reportes Ciudadanos</h1>
+        <p class="page-subtitle">Infraestructura urbana · Período activo: Octubre 2026</p>
+    </section>
+
+    <!-- Pestañas de Filtro por Categoría -->
+    <nav class="tabs-container">
+        <div class="tabs-wrapper">
+            <!-- Pestaña TODOS -->
+            <button class="tab-button" [class.active]="categoriaSeleccionada === 'Todos'"
+                (click)="seleccionarCategoria('Todos')" title="Ver todos los reportes">
+                Todos
+                <span class="tab-badge">{{ totalReportesGeneral }}</span>
+            </button>
+
+            <!-- Categorías dinámicas desde Backend -->
+            @for (cat of categorias; track cat.nombre) {
+            <button class="tab-button" [class.active]="categoriaSeleccionada === cat.nombre"
+                (click)="seleccionarCategoria(cat.nombre)" [title]="'Filtrar por ' + cat.nombre">
+                {{ cat.nombre }}
+                <span class="tab-badge">{{ cat.conteo }}</span>
+            </button>
+            } @empty {
+            @if (cargandoCategorias) {
+            <span class="tabs-loading">Cargando categorías...</span>
+            } @else {
+            <span class="tabs-loading">Sin categorías registradas</span>
+            }
+            }
+        </div>
+    </nav>
+
+    <!-- Tarjetas de Métricas / Resumen (KPIs) -->
+    <section class="kpi-grid">
+        <div class="kpi-card kpi-total">
+            <div class="kpi-indicator"></div>
+            <div class="kpi-data">
+                <span class="kpi-value">{{ metricas.totalReportes }}</span>
+                <span class="kpi-label">Total Reportes</span>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-urgente">
+            <div class="kpi-indicator"></div>
+            <div class="kpi-data">
+                <span class="kpi-value">{{ metricas.urgenciaAlta }}</span>
+                <span class="kpi-label">Urgencia Alta</span>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-finalizados">
+            <div class="kpi-indicator"></div>
+            <div class="kpi-data">
+                <span class="kpi-value">{{ metricas.finalizados }}</span>
+                <span class="kpi-label">Finalizados</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabla de Reportes (Muestra todos los campos recibidos de la base de datos) -->
+    <section class="table-card">
+        <div class="table-responsive">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>CÓDIGO</th>
+                        <th>CATEGORÍA</th>
+                        <th>DESCRIPCIÓN</th>
+                        <th>DIRECCIÓN</th>
+                        <th>FECHA INGRESO</th>
+                        <th>URGENCIA</th>
+                        <th>SENTIMIENTO</th>
+                        <th>ESTADO</th>
+                        <th>NIVEL RIESGO</th>
+                        <th>AJUSTE</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (cargandoReportes) {
+                    <tr>
+                        <td colspan="12" class="table-state-cell">
+                            <div class="state-wrapper">
+                                <span class="spinner"></span>
+                                <span>Cargando reportes desde la base de datos...</span>
+                            </div>
+                        </td>
+                    </tr>
+                    } @else if (errorReportes) {
+                    <tr>
+                        <td colspan="12" class="table-state-cell">
+                            <div class="state-wrapper error-state">
+                                <span>⚠️ {{ errorReportes }}</span>
+                                <button class="btn-retry" (click)="cargarReportes(categoriaSeleccionada)">Reintentar</button>
+                            </div>
+                        </td>
+                    </tr>
+                    } @else if (reportes.length === 0) {
+                    <tr>
+                        <td colspan="12" class="table-state-cell">
+                            <div class="state-wrapper empty-state">
+                                <span>📂 No se encontraron reportes en esta categoría.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    } @else {
+                    @for (reporte of reportes; track reporte.id) {
+                    <tr>
+                        <!-- ID numérico (PK) -->
+                        <td>
+                            <span class="id-badge">#{{ reporte.id }}</span>
+                        </td>
+
+                        <!-- Código con formato RPT-XXXX -->
+                        <td>
+                            <span class="code-badge">{{ reporte.codigo }}</span>
+                        </td>
+
+                        <!-- Categoría -->
+                        <td>
+                            <span class="category-pill">{{ reporte.categoria }}</span>
+                        </td>
+
+                        <!-- Descripción / Texto -->
+                        <td class="report-text" [title]="reporte.texto">
+                            {{ reporte.texto }}
+                        </td>
+
+                        <!-- Dirección -->
+                        <td class="report-address" [title]="reporte.direccion">
+                            {{ reporte.direccion }}
+                        </td>
+
+                        <!-- Fecha de Ingreso -->
+                        <td class="report-date">{{ reporte.fechaIngreso }}</td>
+
+                        <!-- Urgencia -->
+                        <td>
+                            <span class="urgency-pill" [ngClass]="obtenerClaseUrgencia(reporte.urgencia)">
+                                <span class="dot"></span>
+                                {{ reporte.urgencia }}
+                            </span>
+                        </td>
+
+                        <!-- Sentimiento -->
+                        <td>
+                            <span class="sentiment-text" [ngClass]="obtenerClaseSentimiento(reporte.sentimiento)">
+                                {{ reporte.sentimiento }}
+                            </span>
+                        </td>
+
+                        <!-- Estado -->
+                        <td>
+                            <span class="status-pill" [ngClass]="obtenerClaseEstado(reporte.estado)">
+                                {{ reporte.estado }}
+                            </span>
+                        </td>
+
+                        <!-- Nivel de Riesgo (CRITICO, ALTO, MEDIO, BAJO, NINGUNO) -->
+                        <td>
+                            <span class="risk-badge" [ngClass]="obtenerClaseRiesgo(reporte.nivelRiesgo)">
+                                {{ reporte.nivelRiesgo }}
+                            </span>
+                        </td>
+
+                        <!-- Hubo Ajuste (True/False) -->
+                        <td>
+                            <span class="ajuste-badge" [class.ajustado]="reporte.huboAjuste" [class.sin-ajuste]="!reporte.huboAjuste">
+                                {{ reporte.huboAjuste ? 'Ajustado' : 'Automático' }}
+                            </span>
+                        </td>
+
+                        <!-- Botones de Acción -->
+                        <td>
+                            <div class="actions-group">
+                                <button class="btn-action-outline" (click)="verSeguimiento(reporte.codigo)">
+                                    Seguimiento
+                                </button>
+                                <button class="btn-action-primary" (click)="gestionarReporte(reporte.id, reporte.codigo)">
+                                    Gestionar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pie de Tabla -->
+        <footer class="table-footer">
+            <span>
+                @if (cargandoReportes) {
+                    Consultando datos...
+                } @else {
+                    {{ reportes.length }} reporte(s) {{ categoriaSeleccionada === 'Todos' ? 'en total' : 'en categoría ' + categoriaSeleccionada }}
+                }
+            </span>
+            <span>Base de datos sincronizada</span>
+        </footer>
+    </section>
+
+</main>
