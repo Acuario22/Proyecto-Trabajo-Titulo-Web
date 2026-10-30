@@ -12,6 +12,12 @@ public interface ReporteService {
     /** Retorna todos los reportes, o filtrados por categoría si se proporciona. */
     List<ReporteDTO> listarReportes(String categoria);
 
+    /** Retorna reportes filtrados por categoría y/o ID de estado si se proporcionan. */
+    List<ReporteDTO> listarReportes(String categoria, Integer idEstado);
+
+    /** Retorna reportes filtrados únicamente por ID de estado (1 a 4). */
+    List<ReporteDTO> listarPorEstado(Integer idEstado);
+
     /** Consulta unitaria optimizada por PK (JOIN FETCH, sin N+1). */
     ReporteDTO obtenerReportePorId(Integer id);
 

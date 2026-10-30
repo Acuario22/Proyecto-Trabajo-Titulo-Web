@@ -1,0 +1,171 @@
+@if (visible && reporte) {
+<div class="modal-backdrop" (click)="onCerrar()" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+        <!-- 1. Cabecera del Modal: Título "Detalle del reporte" y código a la izquierda, botón ✕ a la derecha -->
+        <header class="modal-header">
+            <div class="modal-header-meta">
+                <h2 class="modal-header-title">Detalle del reporte</h2>
+                <span class="code-badge modal-code-badge">{{ reporte.codigo }}</span>
+            </div>
+            <button type="button" class="btn-close-modal" (click)="onCerrar()" aria-label="Cerrar modal"
+                title="Cerrar ventana">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Cuerpo del Modal -->
+        <div class="modal-body">
+            <!-- 2. SECCIÓN 1: Información -->
+            <section class="modal-section">
+                <h3 class="modal-section-title" id="modal-titulo">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Información
+                </h3>
+
+                <!-- Tarjetas de metadatos: ID Técnico, Categoría, Sentimiento Detectado (ML) y Fecha de Ingreso -->
+                <div class="modal-chips-grid">
+                    <div class="modal-chip-item">
+                        <span class="chip-label">ID</span>
+                        <span class="id-badge">#{{ reporte.id }}</span>
+                    </div>
+                    <div class="modal-chip-item">
+                        <span class="chip-label">Categoría</span>
+                        <span class="category-pill">{{ reporte.categoria }}</span>
+                    </div>
+                    <div class="modal-chip-item">
+                        <span class="chip-label">Sentimiento Detectado (ML)</span>
+                        <span class="sentiment-badge" [ngClass]="obtenerClaseSentimiento(reporte.sentimiento)">
+                            <span class="dot"></span>
+                            {{ reporte.sentimiento || 'Neutral' }}
+                        </span>
+                    </div>
+                    <div class="modal-chip-item">
+                        <span class="chip-label">Fecha de Ingreso</span>
+                        <span class="chip-value-text date-text">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            {{ reporte.fechaIngreso }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 1° Primero: DESCRIPCIÓN (Texto completo del reporte) -->
+                <div class="modal-text-block">
+                    <span class="chip-label">Descripción</span>
+                    <p class="modal-full-text">{{ reporte.texto }}</p>
+                </div>
+
+                <!-- 2° Segundo: DIRECCIÓN (Icono de ubicación y dirección reportada) -->
+                <div class="modal-text-block">
+                    <span class="chip-label">Dirección</span>
+                    <span class="chip-value-text address-text">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        {{ reporte.direccion }}
+                    </span>
+                </div>
+            </section>
+
+            <!-- 3. SECCIÓN 2: Motor de priorización -->
+            <section class="modal-section">
+                <div class="section-title-group">
+                    <h3 class="modal-section-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Motor de priorización
+                    </h3>
+                    <p class="modal-section-subtitle">
+                        Inferencia del modelo ML combinada con el diagnóstico del motor de reglas.
+                    </p>
+                </div>
+
+                <!-- Diagrama horizontal de 3 tarjetas conectadas por flechas -->
+                <div class="prioritization-flow">
+                    <!-- Tarjeta 1: Predicción ML -->
+                    <div class="flow-step">
+                        <span class="step-title">Predicción ML</span>
+                        <div class="step-badge-wrap">
+                            <span class="urgency-pill"
+                                [ngClass]="obtenerClaseUrgencia(reporte.urgenciaMl || reporte.urgencia)">
+                                <span class="dot"></span>
+                                {{ reporte.urgenciaMl || reporte.urgencia }}
+                            </span>
+                        </div>
+                        <span class="step-caption">Salida cruda del clasificador</span>
+                    </div>
+
+                    <!-- Conector flecha ➔ -->
+                    <div class="flow-arrow" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </div>
+
+                    <!-- Tarjeta 2: Diagnóstico de reglas -->
+                    <div class="flow-step">
+                        <span class="step-title">Diagnóstico de reglas</span>
+                        <div class="step-badge-wrap">
+                            <span class="risk-badge" [ngClass]="obtenerClaseRiesgo(reporte.nivelRiesgo)">
+                                <span class="dot"></span>
+                                {{ reporte.nivelRiesgo || 'NINGUNO' }}
+                            </span>
+                        </div>
+                        <span class="step-caption">Análisis de riesgo en texto</span>
+                    </div>
+
+                    <!-- Conector flecha ➔ -->
+                    <div class="flow-arrow" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </div>
+
+                    <!-- Tarjeta 3: Urgencia final -->
+                    <div class="flow-step step-highlight">
+                        <span class="step-title">Urgencia final</span>
+                        <div class="step-badge-wrap">
+                            <span class="urgency-pill" [ngClass]="obtenerClaseUrgencia(reporte.urgencia)">
+                                <span class="dot"></span>
+                                {{ reporte.urgencia }}
+                            </span>
+                        </div>
+                        <span class="step-caption">Prioridad final aplicada</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 4. Pie del Modal: Únicamente botón Cerrar a la derecha -->
+        <footer class="modal-footer">
+            <button type="button" class="btn-modal-cancel" (click)="onCerrar()">
+                Cerrar
+            </button>
+        </footer>
+    </div>
+</div>
+}

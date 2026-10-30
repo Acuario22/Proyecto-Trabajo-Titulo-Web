@@ -1,139 +1,241 @@
 <!-- Barra Superior Cápsula Flotante Reutilizable -->
-<app-header [mostrarVolver]="true" titulo="Trazabilidad del Reporte" subtitulo="Seguimiento y fases"
-  [mostrarEstado]="true" (volver)="volverAlPanel()">
+<app-header [mostrarVolver]="true" titulo="Trazabilidad del Reporte"
+  subtitulo="Centro de auditoría y seguimiento técnico" (volver)="volverAlPanel()">
 </app-header>
 
 <!-- Contenedor Principal de la Vista de Trazabilidad -->
 <main class="trazabilidad-container">
 
-  <!-- Tarjeta de Resumen del Reporte -->
-  <section class="report-card">
-    <div class="report-header">
-      <span class="code-badge">{{ reporte.codigo }}</span>
-      <div class="tags-container">
-        <span class="urgency-pill" [ngClass]="reporte.urgencia.toLowerCase()">
-          <span class="dot"></span>
-          Urgencia {{ reporte.urgencia }}
-        </span>
-        <span class="sentiment-tag" [ngClass]="reporte.sentimiento.toLowerCase()">
-          {{ reporte.sentimiento }}
-        </span>
-      </div>
+  <!-- Encabezado de Página Principal -->
+  <section class="page-heading">
+    <div class="page-heading-left">
+      <h1 class="page-main-title">{{ reporte.titulo }}</h1>
+      <p class="page-main-subtitle">Historial de avance y auditoría de la faena en terreno</p>
     </div>
-
-    <h2 class="report-title">{{ reporte.titulo }}</h2>
-
-    <div class="report-description-quote">
-      <p class="description-text">{{ reporte.descripcion }}</p>
-    </div>
-
-    <div class="report-meta">
-      <svg class="meta-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-      </svg>
-      <span class="meta-label">Fecha de ingreso:</span>
-      <span class="meta-value">{{ reporte.fechaIngreso }}</span>
+    <div class="page-heading-right">
+      <span class="code-badge-hero">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="9" x2="20" y2="9"></line>
+          <line x1="4" y1="15" x2="20" y2="15"></line>
+          <line x1="10" y1="3" x2="8" y2="21"></line>
+          <line x1="16" y1="3" x2="14" y2="21"></line>
+        </svg>
+        <span>{{ reporte.codigo }}</span>
+      </span>
     </div>
   </section>
 
-  <!-- Encabezado de la Línea de Tiempo -->
-  <section class="section-heading">
-    <h3 class="section-title">Línea de tiempo del proceso</h3>
-    <p class="section-subtitle">Estado actual de la gestión del reporte</p>
-  </section>
+  <!-- Layout de Dos Columnas Skydash -->
+  <div class="trazabilidad-layout">
 
-  <!-- Tarjeta con la Línea de Tiempo Horizontal / Stepper -->
-  <section class="timeline-card">
-    <div class="stepper-wrapper">
+    <!-- Columna Principal (Izquierda) -->
+    <div class="main-column">
 
-      <!-- Línea conectora base -->
-      <div class="timeline-line-background">
-        <div class="timeline-line-active"></div>
-      </div>
-
-      <!-- Pasos del proceso -->
-      <div class="timeline-steps">
-        @for (paso of pasos; track paso.numero) {
-        <div class="timeline-step" [ngClass]="paso.estado">
-
-          <!-- Nodo circular del paso -->
-          <div class="step-node-wrapper">
-            <div class="step-node">
-              @if (paso.numero === 1) {
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      <!-- Tarjeta 1: Ficha Técnica de la Incidencia -->
+      <section class="tarjeta-tecnica">
+        <div class="tecnica-header">
+          <div class="tecnica-tags">
+            <span class="category-pill">{{ reporte.titulo.replace('Reporte de ', '') }}</span>
+            <span class="urgency-pill" [ngClass]="obtenerClaseUrgencia(reporte.urgencia)">
+              <span class="dot"></span>
+              Urgencia {{ reporte.urgencia }}
+            </span>
+            <span class="sentiment-pill" [ngClass]="obtenerClaseSentimiento(reporte.sentimiento)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                 stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"></circle>
-                <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9"></line>
               </svg>
-              } @else if (paso.numero === 2) {
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              <span>{{ reporte.sentimiento }}</span>
+            </span>
+          </div>
+        </div>
+
+        <h3 class="tecnica-section-title">Descripción ciudadana del problema</h3>
+        <div class="description-quote">
+          <p>{{ reporte.descripcion }}</p>
+        </div>
+
+        <!-- Metadatos de la Incidencia -->
+        <div class="meta-strip">
+          <div class="meta-item">
+            <div class="meta-icon-wrapper" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
                 stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"></circle>
-                <polyline points="12 7 12 12 15 14"></polyline>
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
-              } @else {
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"></circle>
-                <polyline points="8.5 12 11 14.5 15.5 9.5"></polyline>
-              </svg>
-              }
+            </div>
+            <div class="meta-content">
+              <span class="meta-label">Fecha de ingreso</span>
+              <span class="meta-val">{{ reporte.fechaIngreso }}</span>
             </div>
           </div>
 
-          <!-- Información del paso -->
-          <div class="step-info">
-            <span class="step-title">{{ paso.titulo }}</span>
-            @if (paso.fecha) {
-            <span class="step-date">{{ paso.fecha }}</span>
+          <div class="meta-item">
+            <div class="meta-icon-wrapper" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </div>
+            <div class="meta-content">
+              <span class="meta-label">Dirección registrada</span>
+              <span class="meta-val location-text" [title]="reporte.direccion">{{ reporte.direccion || 'Sin dirección registrada' }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tarjeta 2: Línea de Tiempo del Proceso (Stepper Skydash 2.0) -->
+      <section class="tarjeta-timeline">
+        <div class="timeline-header-row">
+          <h3 class="timeline-title">Línea de tiempo del proceso</h3>
+        </div>
+
+        <!-- Stepper Visual -->
+        <div class="stepper-container">
+          <!-- Línea base horizontal -->
+          <div class="stepper-line-track">
+            <div class="stepper-line-active"
+              [style.width.%]="calcularPorcentajeProgreso() > 66 ? 100 : (calcularPorcentajeProgreso() > 33 ? 50 : 0)">
+            </div>
+          </div>
+
+          <!-- Pasos de la Línea de Tiempo -->
+          <div class="stepper-steps-grid">
+            @for (paso of pasos; track paso.numero) {
+            <div class="stepper-step" [ngClass]="paso.estado">
+
+              <!-- Nodo Circular -->
+              <div class="step-node-halo">
+                <div class="step-node-circle">
+                  @if (paso.estado === 'completado') {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  } @else if (paso.estado === 'en-proceso') {
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  } @else {
+                  <span class="step-num">{{ paso.numero }}</span>
+                  }
+                </div>
+              </div>
+
+              <!-- Cabecera del Hito -->
+              <div class="step-meta-info">
+                <span class="step-name">{{ paso.titulo }}</span>
+                <span class="step-badge" [class.badge-completado]="paso.estado === 'completado'"
+                  [class.badge-proceso]="paso.estado === 'en-proceso'"
+                  [class.badge-pendiente]="paso.estado === 'pendiente'">
+                  {{ paso.estado === 'completado' ? 'Completado' : (paso.estado === 'en-proceso' ? 'En curso' :
+                  'Pendiente') }}
+                </span>
+              </div>
+
+              <!-- Tarjeta Descriptiva del Hito -->
+              <div class="step-desc-card">
+                <p>{{ paso.descripcion }}</p>
+                @if (paso.fecha) {
+                <span class="step-timestamp">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 15 14"></polyline>
+                  </svg>
+                  {{ paso.fecha }}
+                </span>
+                }
+              </div>
+
+            </div>
             }
           </div>
+        </div>
+      </section>
 
-          <!-- Tarjeta de detalle de estado -->
-          <div class="step-card-box">
-            <p>{{ paso.descripcion }}</p>
+    </div>
+
+    <!-- Columna Lateral (Derecha) -->
+    <aside class="sidebar-column">
+
+      <!-- Tarjeta 1: Estado Operativo en Vivo -->
+      <section class="side-card status-hub-card" [class.hub-revision]="esEnRevision()"
+        [class.hub-finalizado]="esFinalizado()">
+        <div class="hub-header">
+          <div class="live-pulse">
+            <span class="pulse-dot"></span>
+            <span class="pulse-text">ESTADO EN TIEMPO REAL</span>
           </div>
+        </div>
 
+        <h4 class="hub-status-title">{{ reporte.estadoActual }}</h4>
+        <p class="hub-status-desc">{{ reporte.detalleEstadoActual }}</p>
+
+        @if (esEnRevision()) {
+        <div class="hub-action-box">
+          <button type="button" class="btn btn-advertencia btn-bloque" (click)="irARevision()"
+            title="Validar trabajo y cerrar reporte">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Validar y cerrar reporte</span>
+          </button>
+        </div>
+        } @else if (esFinalizado()) {
+        <div class="hub-certified-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>Incidencia resuelta</span>
         </div>
         }
-      </div>
+      </section>
 
-    </div>
-  </section>
+      <!-- Tarjeta 2: Ubicación Registrada -->
+      <section class="side-card location-card">
+        <h4 class="side-card-title">Ubicación en terreno</h4>
+        <div class="location-inner-box">
+          <div class="location-header-row">
+            <div class="location-icon-wrapper" aria-hidden="true">
+              <svg class="location-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </div>
+            <span class="location-tag">GEORREFERENCIACIÓN</span>
+          </div>
+          <span class="location-text-full">{{ reporte.direccion || 'Dirección registrada en terreno' }}</span>
+        </div>
 
-  <!-- Banner Informativo del Estado Actual -->
-  <aside class="status-banner" [class.banner-revision]="esEnRevision()">
-    <div class="banner-left">
-      <div class="banner-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="9"></circle>
-          <polyline points="12 7 12 12 15 14"></polyline>
-        </svg>
-      </div>
-      <div class="banner-text">
-        <h4 class="banner-title">Estado actual: {{ reporte.estadoActual }}</h4>
-        <p class="banner-subtitle">{{ reporte.detalleEstadoActual }}</p>
-      </div>
-    </div>
+        <button type="button" class="btn btn-delineado-primario btn-bloque" (click)="verEnMapa()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          <span>Abrir en Google Maps</span>
+        </button>
+      </section>
 
-    @if (esEnRevision()) {
-    <div class="banner-action">
-      <button type="button" class="btn-ir-revision" (click)="irARevision()"
-        title="Ir a validar trabajo y cerrar reporte">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <span>Ir a revisión y cierre</span>
-      </button>
-    </div>
-    }
-  </aside>
+    </aside>
+
+  </div>
 
 </main>

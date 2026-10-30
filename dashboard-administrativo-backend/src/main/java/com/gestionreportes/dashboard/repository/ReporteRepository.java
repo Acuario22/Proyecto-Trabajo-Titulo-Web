@@ -41,6 +41,27 @@ public interface ReporteRepository extends JpaRepository<Reporte, Integer> {
            "ORDER BY r.fechaIngreso DESC")
     List<Reporte> findAllWithRelationsByCategoria(@Param("categoria") String categoria);
 
+    @Query("SELECT r FROM Reporte r " +
+           "JOIN FETCH r.categoria " +
+           "JOIN FETCH r.sentimiento " +
+           "JOIN FETCH r.urgenciaMl " +
+           "JOIN FETCH r.urgenciaFinal " +
+           "JOIN FETCH r.estado " +
+           "WHERE r.estado.idEstado = :idEstado " +
+           "ORDER BY r.fechaIngreso DESC")
+    List<Reporte> findAllWithRelationsByEstado(@Param("idEstado") Integer idEstado);
+
+    @Query("SELECT r FROM Reporte r " +
+           "JOIN FETCH r.categoria " +
+           "JOIN FETCH r.sentimiento " +
+           "JOIN FETCH r.urgenciaMl " +
+           "JOIN FETCH r.urgenciaFinal " +
+           "JOIN FETCH r.estado " +
+           "WHERE UPPER(r.categoria.nombre) = UPPER(:categoria) " +
+           "AND r.estado.idEstado = :idEstado " +
+           "ORDER BY r.fechaIngreso DESC")
+    List<Reporte> findAllWithRelationsByCategoriaAndEstado(@Param("categoria") String categoria, @Param("idEstado") Integer idEstado);
+
     /**
      * Búsqueda unitaria por PK con JOIN FETCH para evitar el problema N+1.
      * Optimiza GET /api/reportes/{id} para la navegación interna del panel.

@@ -17,6 +17,7 @@ export interface DetalleReporte {
   codigo: string;
   titulo: string;
   descripcion: string;
+  direccion?: string;
   fechaIngreso: string;
   urgencia: Urgencia;
   sentimiento: Sentimiento;
@@ -44,9 +45,10 @@ export class TrazabilidadReporteComponent implements OnInit {
   cargando: boolean = true;
 
   reporte: DetalleReporte = {
-    codigo: 'RPT-2024-0001',
+    codigo: 'RPT-2026-0001',
     titulo: 'Reporte de Pavimentación',
     descripcion: 'Cargando detalle del reporte...',
+    direccion: 'Cargando dirección...',
     fechaIngreso: '--/--/----',
     urgencia: 'Baja',
     sentimiento: 'Neutral',
@@ -95,9 +97,10 @@ export class TrazabilidadReporteComponent implements OnInit {
             codigo: data.codigo || this.reporte.codigo,
             titulo: data.titulo || this.reporte.titulo,
             descripcion: data.descripcion || this.reporte.descripcion,
+            direccion: data.direccion || this.reporte.direccion || 'Dirección registrada en terreno',
             fechaIngreso: data.fechaIngreso || this.reporte.fechaIngreso,
-            urgencia: data.urgencia || this.reporte.urgencia,
-            sentimiento: data.sentimiento || this.reporte.sentimiento,
+            urgencia: (data.urgencia as Urgencia) || this.reporte.urgencia,
+            sentimiento: (data.sentimiento as Sentimiento) || this.reporte.sentimiento,
             estadoActual: data.estadoActual || this.reporte.estadoActual,
             detalleEstadoActual: data.detalleEstadoActual || this.reporte.detalleEstadoActual
           };
@@ -117,10 +120,42 @@ export class TrazabilidadReporteComponent implements OnInit {
     });
   }
 
+  calcularPorcentajeProgreso(): number {
+    if (!this.pasos || this.pasos.length === 0) return 0;
+    const completados = this.pasos.filter(p => p.estado === 'completado').length;
+    const enProceso = this.pasos.filter(p => p.estado === 'en-proceso').length;
+    if (completados === this.pasos.length) return 100;
+    if (completados === 0 && enProceso > 0) return 33;
+    if (completados === 1 && enProceso > 0) return 66;
+    if (completados === 2 && enProceso > 0) return 85;
+    return Math.round(((completados + enProceso * 0.5) / this.pasos.length) * 100);
+  }
+
+  obtenerClaseUrgencia(urgencia: string): string {
+    const u = (urgencia || '').toLowerCase().trim();
+    if (u.includes('alta') || u.includes('critica') || u.includes('urgente')) return 'alta';
+    if (u.includes('media') || u.includes('moderada')) return 'media';
+    return 'baja';
+  }
+
+  obtenerClaseSentimiento(sentimiento: string): string {
+    const s = (sentimiento || '').toLowerCase().trim();
+    if (s.includes('enojado') || s.includes('negativo')) return 'negativo';
+    if (s.includes('frustrado')) return 'frustrado';
+    if (s.includes('positivo')) return 'positivo';
+    return 'neutral';
+  }
+
   esEnRevision(): boolean {
     if (!this.reporte || !this.reporte.estadoActual) return false;
     const e = this.reporte.estadoActual.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     return e.includes('revision');
+  }
+
+  esFinalizado(): boolean {
+    if (!this.reporte || !this.reporte.estadoActual) return false;
+    const e = this.reporte.estadoActual.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return e.includes('finalizado');
   }
 
   irARevision(): void {
@@ -128,7 +163,13 @@ export class TrazabilidadReporteComponent implements OnInit {
     this.router.navigate(['/revisar', id]);
   }
 
+  verEnMapa(): void {
+    const dir = encodeURIComponent(this.reporte.direccion || 'Municipalidad');
+    window.open(`https://www.google.com/maps/search/?api=1&query=${dir}`, '_blank');
+  }
+
   volverAlPanel(): void {
     this.router.navigate(['/panel-administrativo']);
   }
 }
+

@@ -16,7 +16,7 @@ public class ReporteDTO {
     @Schema(description = "Clave primaria numérica del reporte (PK de TBLREPORTES)", example = "1")
     private Integer id;
 
-    @Schema(description = "Código de visualización con formato de negocio", example = "RPT-2024-0001")
+    @Schema(description = "Código de visualización con formato de negocio", example = "RPT-2026-0001")
     private String codigo;
 
     @Schema(description = "Nombre de la categoría del reporte", example = "Pavimentacion")
@@ -34,11 +34,17 @@ public class ReporteDTO {
     @Schema(description = "Nivel de urgencia final aplicado al reporte", example = "Alta")
     private String urgencia;
 
+    @Schema(description = "Predicción original de urgencia del modelo Machine Learning (ID_URGENCIA_ML)", example = "Media")
+    private String urgenciaMl;
+
     @Schema(description = "Sentimiento detectado en el texto del reporte", example = "Enojado")
     private String sentimiento;
 
     @Schema(description = "Estado actual del reporte en el flujo de gestión", example = "Iniciado")
     private String estado;
+
+    @Schema(description = "ID numérico del estado del reporte (1 = No iniciado, 2 = Iniciado, 3 = En revisión, 4 = Finalizado)", example = "2")
+    private Integer idEstado;
 
     @Schema(description = "Nivel de riesgo calculado por el motor de priorización", example = "ALTO", allowableValues = {
             "NINGUNO", "BAJO", "MEDIO", "ALTO", "CRITICO" })

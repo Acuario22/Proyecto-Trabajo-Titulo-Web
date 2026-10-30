@@ -30,16 +30,35 @@ public class ReporteController {
     private final ReporteService reporteService;
 
     /**
-     * GET /api/reportes/
-     * Retorna todos los reportes, con filtro opcional por categoría.
+     * GET /api/reportes
+     * Retorna todos los reportes, con filtros opcionales por categoría y/o estado.
      * Ejemplo sin filtro: GET /api/reportes
-     * Ejemplo con filtro: GET /api/reportes?categoria=Pavimentacion
+     * Ejemplo con categoría: GET /api/reportes?categoria=Pavimentacion
+     * Ejemplo con estado: GET /api/reportes?estado=1 (o 2, 3, 4)
+     * Ejemplo combinado: GET /api/reportes?categoria=Pavimentacion&estado=2
      */
     @GetMapping
-    @Operation(summary = "Listar reportes", description = "Retorna todos los reportes de la base de datos. Si se proporciona el parámetro 'categoria', filtra por ese valor (búsqueda insensible a mayúsculas).")
+    @Operation(summary = "Listar reportes", description = "Retorna todos los reportes de la base de datos con filtros opcionales por categoría y/o estado (1=No iniciado, 2=Iniciado, 3=En revisión, 4=Finalizado).")
     public ResponseEntity<List<ReporteDTO>> listarReportes(
-            @Parameter(description = "Nombre de la categoría para filtrar (opcional)", example = "Pavimentacion") @RequestParam(required = false) String categoria) {
-        return ResponseEntity.ok(reporteService.listarReportes(categoria));
+            @Parameter(description = "Nombre de la categoría para filtrar (opcional)", example = "Pavimentacion")
+            @RequestParam(required = false) String categoria,
+            @Parameter(description = "ID del estado (1 = No iniciado, 2 = Iniciado, 3 = En revisión, 4 = Finalizado) o nombre del estado", example = "2")
+            @RequestParam(required = false) String estado) {
+        Integer idEstado = parsearIdEstado(estado);
+        return ResponseEntity.ok(reporteService.listarReportes(categoria, idEstado));
+    }
+
+    /**
+     * GET /api/reportes/estado/{idEstado}
+     * Retorna reportes filtrados por su ID numérico de estado.
+     * Ejemplo: GET /api/reportes/estado/1
+     */
+    @GetMapping("/estado/{idEstado:[0-9]+}")
+    @Operation(summary = "Obtener reportes por estado", description = "Filtra reportes por su ID numérico de estado: 1=No iniciado, 2=Iniciado, 3=En revisión, 4=Finalizado.")
+    public ResponseEntity<List<ReporteDTO>> listarPorEstado(
+            @Parameter(description = "ID numérico del estado (1 a 4)", example = "1")
+            @PathVariable Integer idEstado) {
+        return ResponseEntity.ok(reporteService.listarPorEstado(idEstado));
     }
 
     /**
@@ -87,12 +106,12 @@ public class ReporteController {
 
     /**
      * GET /api/reportes/{identificador}/trazabilidad
-     * Acepta ID numérico o código RPT-2024-XXXX.
+     * Acepta ID numérico o código formateado RPT-AAAA-XXXX (ej. RPT-2026-0001).
      */
     @GetMapping("/{identificador}/trazabilidad")
-    @Operation(summary = "Obtener trazabilidad de reporte", description = "Retorna el detalle completo y la línea de tiempo de seguimiento de un reporte. Acepta ID numérico (ej: 1) o código formateado (ej: RPT-2024-0001).")
+    @Operation(summary = "Obtener trazabilidad de reporte", description = "Retorna el detalle completo y la línea de tiempo de seguimiento de un reporte. Acepta ID numérico (ej: 1) o código formateado (ej: RPT-2026-0001).")
     public ResponseEntity<TrazabilidadReporteDTO> obtenerTrazabilidad(
-            @Parameter(description = "ID numérico o código RPT-2024-XXXX del reporte", example = "RPT-2024-0001") @PathVariable String identificador) {
+            @Parameter(description = "ID numérico o código formateado del reporte (ej: RPT-2026-0001)", example = "RPT-2026-0001") @PathVariable String identificador) {
         return ResponseEntity.ok(reporteService.obtenerTrazabilidad(identificador));
     }
 
@@ -144,5 +163,21 @@ public class ReporteController {
             @Valid @RequestBody CerrarReporteRequestDTO request) {
         OrdenTrabajoResponseDTO orden = reporteService.finalizarReporte(id, request);
         return ResponseEntity.ok(orden);
+    }
+
+    private Integer parsearIdEstado(String estado) {
+        if (estado == null || estado.trim().isEmpty() || estado.equalsIgnoreCase("TODOS")) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(estado.trim());
+        } catch (NumberFormatException e) {
+            String lower = estado.toLowerCase().trim();
+            if (lower.contains("no")) return 1;
+            if (lower.contains("revision") || lower.contains("proceso")) return 3;
+            if (lower.contains("iniciado")) return 2;
+            if (lower.contains("finalizado")) return 4;
+            return null;
+        }
     }
 }

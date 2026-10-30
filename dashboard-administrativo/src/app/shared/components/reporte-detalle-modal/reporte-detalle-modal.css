@@ -1,0 +1,786 @@
+/* ==========================================================================
+   COMPONENTE MODAL DE "MÁS INFORMACIÓN" DEL REPORTE (REUTILIZABLE)
+   Estandarización de Cápsulas, Bordes y Jerarquía Visual Normalizada
+   ========================================================================== */
+
+:host {
+    display: contents;
+}
+
+/* Fondo con efecto blur y centrado */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    animation: modalBackdropFadeIn 0.22s ease-out both;
+}
+
+@keyframes modalBackdropFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Tarjeta principal del modal */
+.modal-card {
+    background-color: var(--color-superficie-blanca);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.22),
+                0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    width: 100%;
+    max-width: 680px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalZoomIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes modalZoomIn {
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ==========================================================================
+   1. CABECERA DEL MODAL
+   ========================================================================== */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.6rem;
+    border-bottom: 1px solid #EDF2F7;
+    background-color: var(--color-superficie-blanca);
+}
+
+.modal-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-header-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: var(--peso-negrita);
+    color: #1E293B;
+    letter-spacing: -0.2px;
+}
+
+/* Código en la cabecera: estilo técnico neutro y limpio */
+.code-badge.modal-code-badge {
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 9999px;
+    background-color: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #1E293B;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.84rem;
+    font-weight: var(--peso-negrita);
+    letter-spacing: -0.2px;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-close-modal {
+    border: 1px solid #E2E8F0;
+    background-color: #F8FAFC;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748B;
+    cursor: pointer;
+    transition: all var(--transicion-rapida);
+}
+
+.btn-close-modal:hover {
+    background-color: #FEE2E2;
+    border-color: #FECACA;
+    color: #DC2626;
+    transform: scale(1.06);
+}
+
+/* ==========================================================================
+   CUERPO DEL MODAL & SCROLLBAR FLUIDO
+   ========================================================================== */
+.modal-body {
+    padding: 1.35rem 1.6rem;
+    overflow-y: auto;
+    max-height: calc(88vh - 130px);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 8px 0;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background-color: #CBD5E1;
+    border-radius: 9999px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background-color: #94A3B8;
+}
+
+.modal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.section-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.modal-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.94rem;
+    font-weight: var(--peso-negrita);
+    color: #1E293B;
+    margin: 0;
+    letter-spacing: -0.2px;
+}
+
+.modal-section-title svg {
+    color: var(--color-primario);
+    flex-shrink: 0;
+}
+
+.modal-section-subtitle {
+    font-size: 0.78rem;
+    color: #64748B;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   SISTEMA DE CÁPSULAS Y BADGES ESTANDARIZADOS (UNIFORMIDAD TOTAL)
+   Geometría idéntica (altura 28px, radio cápsula 9999px, borde 1px)
+   ========================================================================== */
+
+/* 1. Base Común */
+.id-badge,
+.category-pill,
+.sentiment-badge,
+.risk-badge,
+.urgency-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    min-height: 28px;
+    padding: 0 11px;
+    border-radius: 9999px; /* Geometría continua idéntica */
+    font-size: 0.74rem;
+    font-weight: var(--peso-seminegrita);
+    letter-spacing: -0.15px;
+    white-space: nowrap;
+    border-width: 1px;
+    border-style: solid;
+    box-sizing: border-box;
+    user-select: none;
+    transition: all var(--transicion-rapida);
+}
+
+/* Puntos Indicadores (.dot) */
+.sentiment-badge .dot,
+.risk-badge .dot,
+.urgency-pill .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+/* 2. Badge de ID Técnico */
+.id-badge {
+    background-color: #F8FAFC;
+    border-color: #E2E8F0;
+    color: #334155;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: var(--peso-negrita);
+}
+
+/* 3. Cápsula de Categoría */
+.category-pill {
+    background-color: #F8FAFC;
+    border-color: #E2E8F0;
+    color: #475569;
+    font-weight: var(--peso-medio);
+}
+
+/* 4. Badges de Sentimiento */
+.sentiment-badge.neutral,
+.sentiment-badge.neutro {
+    background-color: #F8FAFC;
+    border-color: #E2E8F0;
+    color: #475569;
+}
+.sentiment-badge.neutral .dot,
+.sentiment-badge.neutro .dot {
+    background-color: #94A3B8;
+}
+
+.sentiment-badge.positivo {
+    background-color: #ECFDF5;
+    border-color: #A7F3D0;
+    color: #047857;
+}
+.sentiment-badge.positivo .dot {
+    background-color: #10B981;
+}
+
+.sentiment-badge.frustrado {
+    background-color: #FFFBEB;
+    border-color: #FDE68A;
+    color: #B45309;
+}
+.sentiment-badge.frustrado .dot {
+    background-color: #F59E0B;
+}
+
+.sentiment-badge.enojado,
+.sentiment-badge.negativo {
+    background-color: #FFF1F2;
+    border-color: #FECDD3;
+    color: #BE123C;
+}
+.sentiment-badge.enojado .dot,
+.sentiment-badge.negativo .dot {
+    background-color: #E11D48;
+}
+
+/* 5. Badges de Nivel de Riesgo (Diagnóstico de reglas) */
+.risk-badge.riesgo-ninguno {
+    background-color: #F8FAFC;
+    border-color: #E2E8F0;
+    color: #475569;
+}
+.risk-badge.riesgo-ninguno .dot {
+    background-color: #94A3B8;
+}
+
+.risk-badge.riesgo-bajo {
+    background-color: #ECFDF5;
+    border-color: #A7F3D0;
+    color: #047857;
+}
+.risk-badge.riesgo-bajo .dot {
+    background-color: #10B981;
+}
+
+.risk-badge.riesgo-medio {
+    background-color: #FFFBEB;
+    border-color: #FDE68A;
+    color: #B45309;
+}
+.risk-badge.riesgo-medio .dot {
+    background-color: #F59E0B;
+}
+
+.risk-badge.riesgo-alto,
+.risk-badge.riesgo-critico {
+    background-color: #FFF1F2;
+    border-color: #FECDD3;
+    color: #BE123C;
+}
+.risk-badge.riesgo-alto .dot,
+.risk-badge.riesgo-critico .dot {
+    background-color: #E11D48;
+}
+
+/* 6. Pastillas de Urgencia (Predicción ML y Urgencia final) */
+.urgency-pill.baja {
+    background-color: #ECFDF5;
+    border-color: #A7F3D0;
+    color: #047857;
+}
+.urgency-pill.baja .dot {
+    background-color: #10B981;
+}
+
+.urgency-pill.media {
+    background-color: #FFFBEB;
+    border-color: #FDE68A;
+    color: #B45309;
+}
+.urgency-pill.media .dot {
+    background-color: #F59E0B;
+}
+
+.urgency-pill.alta {
+    background-color: #FFF1F2;
+    border-color: #FECDD3;
+    color: #BE123C;
+}
+.urgency-pill.alta .dot {
+    background-color: #E11D48;
+    box-shadow: 0 0 6px rgba(225, 29, 72, 0.4);
+    animation: urgencyPulse 1.6s infinite ease-in-out;
+}
+
+@keyframes urgencyPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 0.75;
+    }
+}
+
+/* ==========================================================================
+   2. SECCIÓN 1: METADATOS Y TARJETAS DE INFORMACIÓN
+   ========================================================================== */
+.modal-chips-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.modal-chip-item {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 0.8rem 0.95rem;
+    min-height: 82px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.4rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: border-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
+}
+
+.modal-chip-item:hover {
+    border-color: #CBD5E1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.chip-label {
+    font-size: 0.68rem;
+    font-weight: var(--peso-negrita);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748B;
+}
+
+.chip-value-text {
+    font-size: 0.84rem;
+    font-weight: var(--peso-seminegrita);
+    color: #1E293B;
+}
+
+.date-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-variant-numeric: tabular-nums;
+    color: #334155;
+    font-size: 0.82rem;
+}
+
+.date-text svg {
+    color: var(--color-primario);
+    flex-shrink: 0;
+}
+
+/* Bloques de Descripción y Dirección */
+.modal-text-block {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 0.95rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: border-color var(--transicion-rapida);
+}
+
+.modal-text-block:hover {
+    border-color: #CBD5E1;
+}
+
+.modal-full-text {
+    font-size: 0.88rem;
+    color: #1E293B;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.address-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    word-break: break-word;
+    color: #334155;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.address-text svg {
+    color: var(--color-primario);
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   3. SECCIÓN 2: MOTOR DE PRIORIZACIÓN (DIAGRAMA PIPELINE)
+   ========================================================================== */
+.prioritization-flow {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 0.65rem;
+    padding: 1.15rem;
+    background: linear-gradient(135deg, rgba(239, 246, 255, 0.6) 0%, rgba(245, 243, 255, 0.6) 100%);
+    border: 1px solid #E0E7FF;
+    border-radius: 14px;
+}
+
+.flow-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.45rem;
+    padding: 1rem 0.6rem;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    transition: all var(--transicion-rapida);
+}
+
+.flow-step.step-highlight {
+    border-color: #818CF8;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F5F3FF 100%);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.12);
+}
+
+.step-title {
+    font-size: 0.76rem;
+    font-weight: var(--peso-negrita);
+    color: #1E293B;
+}
+
+.step-badge-wrap {
+    margin: 0.2rem 0;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-caption {
+    font-size: 0.68rem;
+    color: #64748B;
+    line-height: 1.3;
+}
+
+.flow-arrow {
+    color: #6366F1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0 2px;
+}
+
+/* ==========================================================================
+   4. PIE DEL MODAL (ÚNICAMENTE BOTÓN CERRAR)
+   ========================================================================== */
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.95rem 1.6rem;
+    border-top: 1px solid #EDF2F7;
+    background-color: var(--color-superficie-blanca);
+}
+
+.btn-modal-cancel {
+    height: 36px;
+    padding: 0 1.5rem;
+    border: 1px solid #CBD5E1;
+    background-color: #F8FAFC;
+    color: #334155;
+    font-size: 0.84rem;
+    font-weight: var(--peso-seminegrita);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all var(--transicion-rapida);
+}
+
+.btn-modal-cancel:hover {
+    background-color: #1E293B;
+    border-color: #1E293B;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (TABLETS Y MÓVILES)
+   ========================================================================== */
+@media (max-width: 640px) {
+    .modal-chips-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .prioritization-flow {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .flow-arrow {
+        transform: rotate(90deg);
+        padding: 4px 0;
+    }
+}
+
+/* ==========================================================================
+   AJUSTES EN MODO OSCURO
+   ========================================================================== */
+:host-context([data-theme="dark"]) .modal-card,
+:host-context(body.dark-mode) .modal-card {
+    background-color: #0F172A;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.85),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+:host-context([data-theme="dark"]) .modal-header,
+:host-context(body.dark-mode) .modal-header {
+    background-color: #0F172A;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+:host-context([data-theme="dark"]) .modal-header-title,
+:host-context(body.dark-mode) .modal-header-title {
+    color: #F8FAFC;
+}
+
+:host-context([data-theme="dark"]) .code-badge.modal-code-badge,
+:host-context(body.dark-mode) .code-badge.modal-code-badge {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #F1F5F9;
+}
+
+:host-context([data-theme="dark"]) .btn-close-modal,
+:host-context(body.dark-mode) .btn-close-modal {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #94A3B8;
+}
+
+:host-context([data-theme="dark"]) .modal-section-title,
+:host-context(body.dark-mode) .modal-section-title,
+:host-context([data-theme="dark"]) .step-title,
+:host-context(body.dark-mode) .step-title,
+:host-context([data-theme="dark"]) .modal-full-text,
+:host-context(body.dark-mode) .modal-full-text {
+    color: #F8FAFC;
+}
+
+:host-context([data-theme="dark"]) .modal-chip-item,
+:host-context(body.dark-mode) .modal-chip-item,
+:host-context([data-theme="dark"]) .modal-text-block,
+:host-context(body.dark-mode) .modal-text-block {
+    background-color: #1E293B;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+:host-context([data-theme="dark"]) .modal-chip-item:hover,
+:host-context(body.dark-mode) .modal-chip-item:hover,
+:host-context([data-theme="dark"]) .modal-text-block:hover,
+:host-context(body.dark-mode) .modal-text-block:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+:host-context([data-theme="dark"]) .chip-label,
+:host-context(body.dark-mode) .chip-label,
+:host-context([data-theme="dark"]) .step-caption,
+:host-context(body.dark-mode) .step-caption,
+:host-context([data-theme="dark"]) .modal-section-subtitle,
+:host-context(body.dark-mode) .modal-section-subtitle {
+    color: #94A3B8;
+}
+
+:host-context([data-theme="dark"]) .id-badge,
+:host-context(body.dark-mode) .id-badge {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #E2E8F0;
+}
+
+:host-context([data-theme="dark"]) .category-pill,
+:host-context(body.dark-mode) .category-pill {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #94A3B8;
+}
+
+:host-context([data-theme="dark"]) .chip-value-text,
+:host-context(body.dark-mode) .chip-value-text,
+:host-context([data-theme="dark"]) .address-text,
+:host-context(body.dark-mode) .address-text {
+    color: #E2E8F0;
+}
+
+:host-context([data-theme="dark"]) .prioritization-flow,
+:host-context(body.dark-mode) .prioritization-flow {
+    background: rgba(30, 41, 59, 0.5);
+    border-color: rgba(99, 102, 241, 0.25);
+}
+
+:host-context([data-theme="dark"]) .flow-step,
+:host-context(body.dark-mode) .flow-step {
+    background-color: #1E293B;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+:host-context([data-theme="dark"]) .flow-step.step-highlight,
+:host-context(body.dark-mode) .flow-step.step-highlight {
+    background: rgba(99, 102, 241, 0.12);
+    border-color: #818CF8;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+}
+
+/* Cápsulas de Sentimiento, Riesgo y Urgencia en Modo Oscuro */
+:host-context([data-theme="dark"]) .sentiment-badge.positivo,
+:host-context(body.dark-mode) .sentiment-badge.positivo,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-bajo,
+:host-context(body.dark-mode) .risk-badge.riesgo-bajo,
+:host-context([data-theme="dark"]) .urgency-pill.baja,
+:host-context(body.dark-mode) .urgency-pill.baja {
+    background-color: rgba(16, 185, 129, 0.14);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #34D399;
+}
+:host-context([data-theme="dark"]) .sentiment-badge.positivo .dot,
+:host-context(body.dark-mode) .sentiment-badge.positivo .dot,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-bajo .dot,
+:host-context(body.dark-mode) .risk-badge.riesgo-bajo .dot,
+:host-context([data-theme="dark"]) .urgency-pill.baja .dot,
+:host-context(body.dark-mode) .urgency-pill.baja .dot {
+    background-color: #34D399;
+}
+
+:host-context([data-theme="dark"]) .sentiment-badge.frustrado,
+:host-context(body.dark-mode) .sentiment-badge.frustrado,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-medio,
+:host-context(body.dark-mode) .risk-badge.riesgo-medio,
+:host-context([data-theme="dark"]) .urgency-pill.media,
+:host-context(body.dark-mode) .urgency-pill.media {
+    background-color: rgba(245, 158, 11, 0.14);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #FBBF24;
+}
+:host-context([data-theme="dark"]) .sentiment-badge.frustrado .dot,
+:host-context(body.dark-mode) .sentiment-badge.frustrado .dot,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-medio .dot,
+:host-context(body.dark-mode) .risk-badge.riesgo-medio .dot,
+:host-context([data-theme="dark"]) .urgency-pill.media .dot,
+:host-context(body.dark-mode) .urgency-pill.media .dot {
+    background-color: #FBBF24;
+}
+
+:host-context([data-theme="dark"]) .sentiment-badge.enojado,
+:host-context(body.dark-mode) .sentiment-badge.enojado,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-alto,
+:host-context(body.dark-mode) .risk-badge.riesgo-alto,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-critico,
+:host-context(body.dark-mode) .risk-badge.riesgo-critico,
+:host-context([data-theme="dark"]) .urgency-pill.alta,
+:host-context(body.dark-mode) .urgency-pill.alta {
+    background-color: rgba(244, 63, 94, 0.14);
+    border-color: rgba(244, 63, 94, 0.35);
+    color: #FB7185;
+}
+:host-context([data-theme="dark"]) .sentiment-badge.enojado .dot,
+:host-context(body.dark-mode) .sentiment-badge.enojado .dot,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-alto .dot,
+:host-context(body.dark-mode) .risk-badge.riesgo-alto .dot,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-critico .dot,
+:host-context(body.dark-mode) .risk-badge.riesgo-critico .dot,
+:host-context([data-theme="dark"]) .urgency-pill.alta .dot,
+:host-context(body.dark-mode) .urgency-pill.alta .dot {
+    background-color: #FB7185;
+}
+
+:host-context([data-theme="dark"]) .sentiment-badge.neutral,
+:host-context(body.dark-mode) .sentiment-badge.neutral,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-ninguno,
+:host-context(body.dark-mode) .risk-badge.riesgo-ninguno {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #CBD5E1;
+}
+:host-context([data-theme="dark"]) .sentiment-badge.neutral .dot,
+:host-context(body.dark-mode) .sentiment-badge.neutral .dot,
+:host-context([data-theme="dark"]) .risk-badge.riesgo-ninguno .dot,
+:host-context(body.dark-mode) .risk-badge.riesgo-ninguno .dot {
+    background-color: #94A3B8;
+}
+
+:host-context([data-theme="dark"]) .modal-footer,
+:host-context(body.dark-mode) .modal-footer {
+    background-color: #0F172A;
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+:host-context([data-theme="dark"]) .btn-modal-cancel,
+:host-context(body.dark-mode) .btn-modal-cancel {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #E2E8F0;
+}
+
+:host-context([data-theme="dark"]) .btn-modal-cancel:hover,
+:host-context(body.dark-mode) .btn-modal-cancel:hover {
+    background-color: var(--color-primario);
+    border-color: var(--color-primario);
+    color: #FFFFFF;
+}

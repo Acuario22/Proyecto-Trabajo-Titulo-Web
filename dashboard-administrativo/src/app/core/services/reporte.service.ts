@@ -10,8 +10,10 @@ export interface Reporte {
   direccion: string;
   fechaIngreso: string;
   urgencia: string;
+  urgenciaMl?: string;
   sentimiento: string;
   estado: string;
+  idEstado?: number;
   nivelRiesgo: string;
   huboAjuste: boolean;
 }
@@ -103,6 +105,29 @@ export class ReporteService {
       return this.obtenerPorCategoria(categoria);
     }
     return this.obtenerTodos();
+  }
+
+  /**
+   * Obtiene reportes filtrados directamente por su ID de estado (1 a 4).
+   * Endpoint: GET /api/reportes/estado/{idEstado}
+   */
+  obtenerPorEstado(idEstado: number): Observable<Reporte[]> {
+    return this.http.get<Reporte[]>(`${this.apiUrl}/estado/${idEstado}`);
+  }
+
+  /**
+   * Obtiene reportes con filtros combinados de categoría y/o estado.
+   * Endpoint: GET /api/reportes?categoria={categoria}&estado={idEstado}
+   */
+  obtenerReportesFiltrados(categoria?: string, idEstado?: number | null): Observable<Reporte[]> {
+    let params = new HttpParams();
+    if (categoria && categoria !== 'Todos') {
+      params = params.set('categoria', categoria);
+    }
+    if (idEstado != null && idEstado > 0) {
+      params = params.set('estado', idEstado.toString());
+    }
+    return this.http.get<Reporte[]>(this.apiUrl, { params });
   }
 
   /**

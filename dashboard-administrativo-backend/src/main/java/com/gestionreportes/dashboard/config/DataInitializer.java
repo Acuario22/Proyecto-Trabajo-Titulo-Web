@@ -64,7 +64,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 5. Reportes de demostración
         Reporte r1 = reporteRepository.save(Reporte.builder()
-                .fechaIngreso(LocalDateTime.of(2024, 11, 3, 10, 30))
+                .fechaIngreso(LocalDateTime.of(2026, 11, 3, 10, 30))
                 .textoReporte("Gran bache en la intersección de Av. Libertad con Calle 5, está causando daños a los vehículos y representa un peligro para los ciclistas que transitan diariamente.")
                 .direccion("Av. Libertad con Calle 5")
                 .categoria(pavimentacion)
@@ -80,19 +80,19 @@ public class DataInitializer implements CommandLineRunner {
         historialReporteRepository.save(HistorialReporte.builder()
                 .reporte(r1)
                 .estado(estadoIniciado)
-                .fechaCambio(LocalDateTime.of(2024, 11, 3, 10, 30))
+                .fechaCambio(LocalDateTime.of(2026, 11, 3, 10, 30))
                 .observacion("Reporte recibido y registrado en el sistema.")
                 .build());
 
         historialReporteRepository.save(HistorialReporte.builder()
                 .reporte(r1)
                 .estado(estadoEnProceso)
-                .fechaCambio(LocalDateTime.of(2024, 11, 5, 14, 15))
+                .fechaCambio(LocalDateTime.of(2026, 11, 5, 14, 15))
                 .observacion("Cuadrilla asignada. Reparación programada para el 10/11.")
                 .build());
 
         Reporte r2 = reporteRepository.save(Reporte.builder()
-                .fechaIngreso(LocalDateTime.of(2024, 11, 5, 9, 0))
+                .fechaIngreso(LocalDateTime.of(2026, 11, 5, 9, 0))
                 .textoReporte("El pavimento frente al mercado municipal presenta hundimientos y grietas profundas que dificultan el tránsito.")
                 .direccion("Frente al mercado municipal")
                 .categoria(pavimentacion)
@@ -107,12 +107,12 @@ public class DataInitializer implements CommandLineRunner {
         historialReporteRepository.save(HistorialReporte.builder()
                 .reporte(r2)
                 .estado(estadoIniciado)
-                .fechaCambio(LocalDateTime.of(2024, 11, 5, 9, 0))
+                .fechaCambio(LocalDateTime.of(2026, 11, 5, 9, 0))
                 .observacion("Reporte ingresado vía canal web.")
                 .build());
 
         Reporte r3 = reporteRepository.save(Reporte.builder()
-                .fechaIngreso(LocalDateTime.of(2024, 10, 28, 16, 45))
+                .fechaIngreso(LocalDateTime.of(2026, 10, 28, 16, 45))
                 .textoReporte("La calle peatonal en el barrio Las Flores fue reparada hace dos semanas y la comunidad está conforme.")
                 .direccion("Barrio Las Flores")
                 .categoria(pavimentacion)
@@ -127,7 +127,7 @@ public class DataInitializer implements CommandLineRunner {
         historialReporteRepository.save(HistorialReporte.builder()
                 .reporte(r3)
                 .estado(estadoFinalizado)
-                .fechaCambio(LocalDateTime.of(2024, 11, 1, 12, 0))
+                .fechaCambio(LocalDateTime.of(2026, 11, 1, 12, 0))
                 .observacion("Trabajos concluidos e inspección técnica aprobada.")
                 .build());
 

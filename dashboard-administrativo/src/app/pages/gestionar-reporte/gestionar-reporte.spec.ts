@@ -11,7 +11,7 @@ describe('GestionarReporteComponent', () => {
   const reporteServiceMock = {
     obtenerReportePorId: () => of({
       id: 1,
-      codigo: 'RPT-2024-0001',
+      codigo: 'RPT-2026-0001',
       categoria: 'Pavimentacion',
       texto: 'Bache en la calle',
       direccion: 'Av. Libertad 123',

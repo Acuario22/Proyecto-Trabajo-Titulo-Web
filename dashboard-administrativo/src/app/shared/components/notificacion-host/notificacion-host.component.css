@@ -1,0 +1,428 @@
+/* ==========================================================================
+   NOTIFICACIÓN HOST - TOASTS Y MODAL DE CONFIRMACIÓN (SKYDASH DESIGN)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   PARTE A: TOASTS FLOTANTES
+   -------------------------------------------------------------------------- */
+.toasts-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 420px;
+  width: calc(100vw - 3rem);
+  pointer-events: none;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.toast-card {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1rem 1.15rem 1.15rem 1.15rem;
+  background-color: var(--color-superficie-blanca);
+  border-radius: var(--radio-borde-m);
+  border: 1px solid var(--color-borde-suave);
+  border-left-width: 4.5px;
+  box-shadow: var(--sombra-l);
+  overflow: hidden;
+  animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform var(--transicion-rapida), box-shadow var(--transicion-rapida);
+}
+
+.toast-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-elevada);
+}
+
+/* Colores de Borde Izquierdo e Identidad */
+.toast-card.toast-exito {
+  border-left-color: var(--color-satisfaccion);
+}
+.toast-card.toast-error {
+  border-left-color: var(--color-alerta);
+}
+.toast-card.toast-advertencia {
+  border-left-color: var(--color-advertencia);
+}
+.toast-card.toast-info {
+  border-left-color: var(--color-informacion);
+}
+
+/* Iconos circulares sólidos con SVG blanco */
+.toast-icon-circle {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: var(--radio-borde-redondo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.toast-card.toast-exito .toast-icon-circle {
+  background-color: var(--color-satisfaccion);
+  box-shadow: 0 2px 8px var(--color-satisfaccion-sombra);
+}
+
+.toast-card.toast-error .toast-icon-circle {
+  background-color: var(--color-alerta);
+  box-shadow: 0 2px 8px var(--color-alerta-sombra);
+}
+
+.toast-card.toast-advertencia .toast-icon-circle {
+  background-color: var(--color-advertencia);
+  box-shadow: 0 2px 8px var(--color-advertencia-sombra);
+}
+
+.toast-card.toast-info .toast-icon-circle {
+  background-color: var(--color-informacion);
+  box-shadow: 0 2px 8px var(--color-informacion-sombra);
+}
+
+/* Contenido de Texto */
+.toast-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toast-title {
+  margin: 0;
+  font-size: var(--tamano-fuente-base);
+  font-weight: var(--peso-negrita);
+  color: var(--color-texto-principal);
+  line-height: 1.3;
+}
+
+.toast-message {
+  margin: 0;
+  font-size: var(--tamano-fuente-s);
+  color: var(--color-texto-regular);
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+/* Botón de cierre manual */
+.toast-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-texto-atenuado);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-borde-s);
+  transition: all var(--transicion-rapida);
+  flex-shrink: 0;
+}
+
+.toast-close-btn:hover {
+  color: var(--color-texto-principal);
+  background-color: var(--color-superficie-hover);
+}
+
+/* Barra inferior animada de progreso (4s) */
+.toast-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+@keyframes toastProgress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.toast-progress-bar {
+  height: 100%;
+  width: 100%;
+  animation: toastProgress 4000ms linear forwards;
+}
+
+.toast-card.toast-exito .toast-progress-bar {
+  background-color: var(--color-satisfaccion);
+}
+.toast-card.toast-error .toast-progress-bar {
+  background-color: var(--color-alerta);
+}
+.toast-card.toast-advertencia .toast-progress-bar {
+  background-color: var(--color-advertencia);
+}
+.toast-card.toast-info .toast-progress-bar {
+  background-color: var(--color-informacion);
+}
+
+/* --------------------------------------------------------------------------
+   PARTE B: MODAL DE CONFIRMACIÓN CENTRADO (Backdrop Blur 6px)
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--fondo-backdrop, rgba(15, 16, 32, 0.52));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: modalFadeIn 0.22s ease-out forwards;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-dialog-card {
+  position: relative;
+  background-color: var(--color-superficie-blanca);
+  border: 1px solid var(--color-borde-suave);
+  border-radius: var(--radio-borde-xl);
+  box-shadow: var(--sombra-elevada);
+  max-width: 480px;
+  width: 100%;
+  padding: 2.25rem 2rem 2rem 2rem;
+  text-align: center;
+  animation: modalScaleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-sizing: border-box;
+}
+
+/* Icono Superior Circular */
+.modal-header-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radio-borde-redondo);
+  margin: 0 auto 1.25rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transicion-suave);
+}
+
+.modal-dialog-card.modal-tipo-primario .modal-header-icon {
+  background-color: var(--color-primario-suave);
+  color: var(--color-primario);
+  border: 2px solid var(--color-primario-borde);
+  box-shadow: 0 4px 14px var(--color-primario-sombra);
+}
+
+.modal-dialog-card.modal-tipo-exito .modal-header-icon {
+  background-color: var(--color-satisfaccion-suave);
+  color: var(--color-satisfaccion);
+  border: 2px solid var(--color-satisfaccion-borde);
+  box-shadow: 0 4px 14px var(--color-satisfaccion-sombra);
+}
+
+.modal-dialog-card.modal-tipo-peligro .modal-header-icon {
+  background-color: var(--color-alerta-suave);
+  color: var(--color-alerta);
+  border: 2px solid var(--color-alerta-borde);
+  box-shadow: 0 4px 14px var(--color-alerta-sombra);
+}
+
+/* Título y Mensaje del Modal */
+.modal-title {
+  margin: 0 0 0.65rem 0;
+  font-size: var(--tamano-fuente-xl);
+  font-weight: var(--peso-negrita);
+  color: var(--color-texto-principal);
+  line-height: 1.3;
+}
+
+.modal-message {
+  margin: 0 0 1.5rem 0;
+  font-size: var(--tamano-fuente-base);
+  color: var(--color-texto-regular);
+  line-height: 1.55;
+}
+
+/* Transición Visual de Estado: [ Estado Actual ] ➔ [ Nuevo Estado ] */
+.state-transition-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  margin: 0 0 1.75rem 0;
+  background-color: var(--color-superficie-gris-suave);
+  border: 1px solid var(--color-borde-suave);
+  border-radius: var(--radio-borde-l);
+}
+
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radio-borde-redondo);
+  font-size: var(--tamano-fuente-s);
+  font-weight: var(--peso-seminegrita);
+  letter-spacing: 0.2px;
+}
+
+.state-badge.badge-no-iniciado {
+  background-color: var(--color-primario-suave);
+  color: var(--color-primario);
+  border: 1px solid var(--color-primario-borde);
+}
+
+.state-badge.badge-iniciado {
+  background-color: var(--color-soporte-celeste-suave);
+  color: var(--color-primario);
+  border: 1px solid #C5D7FE;
+}
+
+.state-badge.badge-revision {
+  background-color: var(--color-advertencia-suave);
+  color: #b38600;
+  border: 1px solid var(--color-advertencia-borde);
+}
+
+.state-badge.badge-finalizado {
+  background-color: var(--color-satisfaccion-suave);
+  color: var(--color-satisfaccion);
+  border: 1px solid var(--color-satisfaccion-borde);
+}
+
+.state-transition-arrow {
+  color: var(--color-primario);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botones de Acción del Modal */
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-modal-cancel {
+  flex: 1;
+  padding: 0.68rem 1.25rem;
+  background-color: transparent;
+  color: var(--color-texto-regular);
+  border: 1.5px solid var(--color-borde-medio);
+  border-radius: var(--radio-borde-m);
+  font-size: var(--tamano-fuente-base);
+  font-weight: var(--peso-seminegrita);
+  cursor: pointer;
+  transition: all var(--transicion-suave);
+}
+
+.btn-modal-cancel:hover {
+  background-color: var(--color-superficie-hover);
+  color: var(--color-texto-principal);
+  border-color: var(--color-borde-fuerte);
+}
+
+.btn-modal-confirm {
+  flex: 1;
+  padding: 0.68rem 1.25rem;
+  color: var(--color-texto-blanco);
+  border: 1.5px solid transparent;
+  border-radius: var(--radio-borde-m);
+  font-size: var(--tamano-fuente-base);
+  font-weight: var(--peso-negrita);
+  cursor: pointer;
+  transition: all var(--transicion-suave);
+}
+
+.modal-dialog-card.modal-tipo-primario .btn-modal-confirm {
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
+  box-shadow: 0 4px 12px var(--color-primario-sombra);
+}
+
+.modal-dialog-card.modal-tipo-primario .btn-modal-confirm:hover {
+  background-color: var(--color-primario-hover);
+  border-color: var(--color-primario-hover);
+  box-shadow: var(--sombra-hover-primario);
+  transform: translateY(-1px);
+}
+
+.modal-dialog-card.modal-tipo-exito .btn-modal-confirm {
+  background-color: var(--color-satisfaccion);
+  border-color: var(--color-satisfaccion);
+  box-shadow: 0 4px 12px var(--color-satisfaccion-sombra);
+}
+
+.modal-dialog-card.modal-tipo-exito .btn-modal-confirm:hover {
+  background-color: var(--color-satisfaccion-hover);
+  border-color: var(--color-satisfaccion-hover);
+  box-shadow: var(--sombra-hover-satisfaccion);
+  transform: translateY(-1px);
+}
+
+.modal-dialog-card.modal-tipo-peligro .btn-modal-confirm {
+  background-color: var(--color-alerta);
+  border-color: var(--color-alerta);
+  box-shadow: 0 4px 12px var(--color-alerta-sombra);
+}
+
+.modal-dialog-card.modal-tipo-peligro .btn-modal-confirm:hover {
+  background-color: var(--color-alerta-hover);
+  border-color: var(--color-alerta-hover);
+  box-shadow: var(--sombra-hover-alerta);
+  transform: translateY(-1px);
+}
+
+.btn-modal-confirm:active,
+.btn-modal-cancel:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 520px) {
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+  .btn-modal-cancel,
+  .btn-modal-confirm {
+    width: 100%;
+  }
+}

@@ -1,0 +1,136 @@
+<!-- ==========================================================================
+     PARTE A: CONTENEDOR DE TOASTS FLOTANTES (Esquina superior derecha)
+     ========================================================================== -->
+<aside class="toasts-container" aria-live="polite" aria-label="Notificaciones del sistema">
+  @for (toast of toasts(); track toast.id) {
+    <div class="toast-card toast-{{ toast.tipo }}" role="alert">
+      <!-- Icono circular sólido con SVG blanco -->
+      <div class="toast-icon-circle">
+        @switch (toast.tipo) {
+          @case ('exito') {
+            <!-- Checkmark blanco -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          }
+          @case ('error') {
+            <!-- Cruz blanca -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          }
+          @case ('advertencia') {
+            <!-- Exclamación blanca -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="7" x2="12" y2="13"></line>
+              <circle cx="12" cy="17" r="1.2" fill="#FFFFFF"></circle>
+            </svg>
+          }
+          @case ('info') {
+            <!-- Información 'i' blanca -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="7" r="1.2" fill="#FFFFFF"></circle>
+              <line x1="12" y1="11" x2="12" y2="17"></line>
+            </svg>
+          }
+        }
+      </div>
+
+      <!-- Contenido textual del Toast -->
+      <div class="toast-content">
+        <h5 class="toast-title">{{ toast.titulo }}</h5>
+        <p class="toast-message">{{ toast.mensaje }}</p>
+      </div>
+
+      <!-- Botón de cierre manual -->
+      <button type="button" class="toast-close-btn" (click)="cerrarToast(toast.id)" aria-label="Cerrar notificación">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Barra inferior animada de progreso (4s) -->
+      @if (toast.duracion > 0) {
+        <div class="toast-progress-track">
+          <div class="toast-progress-bar" [style.animationDuration.ms]="toast.duracion"></div>
+        </div>
+      }
+    </div>
+  }
+</aside>
+
+<!-- ==========================================================================
+     PARTE B: MODAL DE CONFIRMACIÓN CENTRADO (Backdrop Blur 6px)
+     ========================================================================== -->
+@if (modal().visible) {
+  <div class="modal-backdrop" (click)="cancelar()" role="dialog" aria-modal="true">
+    <div class="modal-dialog-card modal-tipo-{{ modal().tipo }}" (click)="$event.stopPropagation()">
+      
+      <!-- Icono circular superior -->
+      <div class="modal-header-icon">
+        @switch (modal().tipo) {
+          @case ('exito') {
+            <!-- Checkmark grande -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          }
+          @case ('peligro') {
+            <!-- Alerta / Exclamación grande -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          }
+          @default {
+            <!-- Interrogación / Asignación formal -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          }
+        }
+      </div>
+
+      <!-- Título y Mensaje -->
+      <h3 class="modal-title">{{ modal().titulo }}</h3>
+      <p class="modal-message">{{ modal().mensaje }}</p>
+
+      <!-- Transición visual de estado si está configurada -->
+      @if (modal().estadoActual && modal().estadoNuevo) {
+        <div class="state-transition-card">
+          <span class="state-badge" [ngClass]="obtenerClaseEstado(modal().estadoActual)">
+            {{ modal().estadoActual }}
+          </span>
+
+          <div class="state-transition-arrow">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+
+          <span class="state-badge" [ngClass]="obtenerClaseEstado(modal().estadoNuevo)">
+            {{ modal().estadoNuevo }}
+          </span>
+        </div>
+      }
+
+      <!-- Botones de Acción -->
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" (click)="cancelar()">
+          {{ modal().textoCancelar }}
+        </button>
+        <button type="button" class="btn-modal-confirm" (click)="confirmar()">
+          {{ modal().textoConfirmar }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

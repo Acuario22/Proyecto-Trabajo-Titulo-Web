@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -7,6 +7,7 @@ import {
   Reporte,
   CrearOrdenTrabajoRequest
 } from '../../core/services/reporte.service';
+import { NotificacionService } from '../../core/services/notificacion.service';
 
 export interface OrdenTrabajoFormModel {
   cuadrilla: string;
@@ -33,11 +34,29 @@ export class GestionarReporteComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private reporteService = inject(ReporteService);
+  private notificacionService = inject(NotificacionService);
   private cdr = inject(ChangeDetectorRef);
+
+  @ViewChild('cuadrillaDropdownRef') cuadrillaDropdownRef?: ElementRef<HTMLElement>;
+  @ViewChild('duracionDropdownRef') duracionDropdownRef?: ElementRef<HTMLElement>;
+  @ViewChild('calendarioDropdownRef') calendarioDropdownRef?: ElementRef<HTMLElement>;
+  @ViewChild('horaDropdownRef') horaDropdownRef?: ElementRef<HTMLElement>;
+
+  dropdownCuadrillaAbierto: boolean = false;
+  dropdownDuracionAbierto: boolean = false;
+  calendarioAbierto: boolean = false;
+  selectorHoraAbierto: boolean = false;
+  mesVisualizado: Date = new Date();
+
+  readonly diasSemana = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
+  readonly horasPresets = ['08:00', '09:00', '10:30', '12:00', '14:00', '15:30', '17:00'];
+  readonly horasDisponibles = ['07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
+  readonly minutosDisponibles = ['00', '15', '30', '45'];
 
   idReporte: number | null = null;
   cargandoReporte: boolean = true;
   guardandoOrden: boolean = false;
+  intentadoGuardar: boolean = false;
   mensajeExito: string | null = null;
   mensajeError: string | null = null;
 
@@ -162,9 +181,9 @@ export class GestionarReporteComponent implements OnInit {
     });
   }
 
-  crearOrdenTrabajo(): void {
+  async crearOrdenTrabajo(): Promise<void> {
     if (!this.idReporte) {
-      alert('Error: no se tiene el identificador del reporte.');
+      this.notificacionService.error('Error de identificador', 'No se tiene el identificador del reporte.');
       return;
     }
 
@@ -177,12 +196,35 @@ export class GestionarReporteComponent implements OnInit {
       !this.form.duracionEstimada ||
       !this.form.instrucciones
     ) {
-      alert('Por favor completa todos los campos obligatorios (*) para crear la orden de trabajo.');
+      this.intentadoGuardar = true;
+      this.notificacionService.advertencia(
+        'Campos obligatorios incompletos',
+        'Por favor completa todos los campos marcados con (*) para crear la orden de trabajo.'
+      );
+      this.cdr.markForCheck();
       return;
     }
 
     if (this.form.cantidadPersonal < 1) {
-      alert('La cantidad de personal debe ser de al menos 1 operario.');
+      this.intentadoGuardar = true;
+      this.notificacionService.advertencia(
+        'Personal insuficiente',
+        'La cantidad de personal debe ser de al menos 1 operario.'
+      );
+      this.cdr.markForCheck();
+      return;
+    }
+
+    // Modal de Confirmación previo al registro
+    const confirmado = await this.notificacionService.confirmar({
+      titulo: '¿Confirmar creación de Orden de Trabajo?',
+      mensaje: 'Asegúrate de haber ingresado la información correctamente. Si es así, confirma para crear la orden de trabajo.',
+      textoConfirmar: 'Sí, crear orden',
+      textoCancelar: 'Volver y revisar',
+      tipo: 'primario'
+    });
+
+    if (!confirmado) {
       return;
     }
 
@@ -204,16 +246,23 @@ export class GestionarReporteComponent implements OnInit {
         this.guardandoOrden = false;
         this.reporte.estado = 'Iniciado';
         this.mensajeExito = '¡Orden de trabajo creada con éxito! El reporte ahora se encuentra en estado Iniciado.';
+        this.notificacionService.exito(
+          'Orden de trabajo creada',
+          'El reporte pasó al estado Iniciado correctamente.'
+        );
         this.cdr.markForCheck();
 
         setTimeout(() => {
           this.volverAlPanel();
-        }, 1800);
+        }, 1200);
       },
       error: (err) => {
         console.error('Error al registrar orden de trabajo:', err);
         this.guardandoOrden = false;
-        alert('Ocurrió un error al registrar la orden de trabajo en la base de datos.');
+        this.notificacionService.error(
+          'Error al registrar orden',
+          err.error?.message || 'Ocurrió un error al registrar la orden de trabajo en la base de datos.'
+        );
         this.cdr.markForCheck();
       }
     });
@@ -225,6 +274,270 @@ export class GestionarReporteComponent implements OnInit {
     if (u.includes('media')) return 'tag-urgency-medium';
     if (u.includes('baja')) return 'tag-urgency-low';
     return 'tag-urgency-low';
+  }
+
+  obtenerClaseSentimiento(sentimiento?: string): string {
+    const s = (sentimiento || '').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (s.includes('enojado') || s.includes('negativo')) return 'enojado';
+    if (s.includes('frustrado')) return 'frustrado';
+    if (s.includes('positivo') || s.includes('feliz')) return 'positivo';
+    return 'neutral';
+  }
+
+  obtenerClaseEstado(estado?: string): string {
+    const e = (estado || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (e.includes('finaliz') || e.includes('resuelt')) return 'tag-estado-finalizado';
+    if (e.includes('proceso') || e.includes('revision')) return 'tag-estado-proceso';
+    if (e.includes('iniciad')) return 'tag-estado-iniciado';
+    return 'tag-estado-pendiente';
+  }
+
+  toggleDropdownCuadrilla(event: MouseEvent): void {
+    event.stopPropagation();
+    this.dropdownCuadrillaAbierto = !this.dropdownCuadrillaAbierto;
+    if (this.dropdownCuadrillaAbierto) {
+      this.dropdownDuracionAbierto = false;
+    }
+    this.cdr.markForCheck();
+  }
+
+  toggleDropdownDuracion(event: MouseEvent): void {
+    event.stopPropagation();
+    this.dropdownDuracionAbierto = !this.dropdownDuracionAbierto;
+    if (this.dropdownDuracionAbierto) {
+      this.dropdownCuadrillaAbierto = false;
+    }
+    this.cdr.markForCheck();
+  }
+
+  seleccionarCuadrilla(cuadrilla: string): void {
+    this.form.cuadrilla = cuadrilla;
+    this.dropdownCuadrillaAbierto = false;
+    this.cdr.markForCheck();
+  }
+
+  seleccionarDuracion(duracion: string): void {
+    this.form.duracionEstimada = duracion;
+    this.dropdownDuracionAbierto = false;
+    this.cdr.markForCheck();
+  }
+
+  get nombreMesVisualizado(): string {
+    const meses = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return `${meses[this.mesVisualizado.getMonth()]} ${this.mesVisualizado.getFullYear()}`;
+  }
+
+  get diasCalendario(): Array<{ fechaStr: string; dia: number; esMesActual: boolean; esHoy: boolean; esSeleccionado: boolean }> {
+    const year = this.mesVisualizado.getFullYear();
+    const month = this.mesVisualizado.getMonth();
+
+    const hoy = new Date();
+    const hoyStr = this.formatearFechaISO(hoy);
+
+    const primerDia = new Date(year, month, 1);
+    let diaSemanaInicio = primerDia.getDay() - 1;
+    if (diaSemanaInicio === -1) diaSemanaInicio = 6;
+
+    const ultimoDia = new Date(year, month + 1, 0);
+    const diasEnMes = ultimoDia.getDate();
+    const ultimoDiaMesAnterior = new Date(year, month, 0).getDate();
+
+    const dias = [];
+
+    for (let i = diaSemanaInicio - 1; i >= 0; i--) {
+      const d = ultimoDiaMesAnterior - i;
+      const fecha = new Date(year, month - 1, d);
+      const fechaStr = this.formatearFechaISO(fecha);
+      dias.push({
+        fechaStr,
+        dia: d,
+        esMesActual: false,
+        esHoy: fechaStr === hoyStr,
+        esSeleccionado: this.form.fechaVisita === fechaStr
+      });
+    }
+
+    for (let d = 1; d <= diasEnMes; d++) {
+      const fecha = new Date(year, month, d);
+      const fechaStr = this.formatearFechaISO(fecha);
+      dias.push({
+        fechaStr,
+        dia: d,
+        esMesActual: true,
+        esHoy: fechaStr === hoyStr,
+        esSeleccionado: this.form.fechaVisita === fechaStr
+      });
+    }
+
+    const celdasRestantes = (7 - (dias.length % 7)) % 7;
+    for (let d = 1; d <= celdasRestantes; d++) {
+      const fecha = new Date(year, month + 1, d);
+      const fechaStr = this.formatearFechaISO(fecha);
+      dias.push({
+        fechaStr,
+        dia: d,
+        esMesActual: false,
+        esHoy: fechaStr === hoyStr,
+        esSeleccionado: this.form.fechaVisita === fechaStr
+      });
+    }
+
+    return dias;
+  }
+
+  formatearFechaISO(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  formatearFechaLegible(fechaISO?: string): string {
+    if (!fechaISO) return '';
+    try {
+      const partes = fechaISO.split('-');
+      if (partes.length === 3) {
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+      return fechaISO;
+    } catch {
+      return fechaISO || '';
+    }
+  }
+
+  cambiarMes(delta: number, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.mesVisualizado = new Date(this.mesVisualizado.getFullYear(), this.mesVisualizado.getMonth() + delta, 1);
+    this.cdr.markForCheck();
+  }
+
+  toggleCalendario(event: MouseEvent): void {
+    event.stopPropagation();
+    this.calendarioAbierto = !this.calendarioAbierto;
+    if (this.calendarioAbierto) {
+      this.selectorHoraAbierto = false;
+      this.dropdownCuadrillaAbierto = false;
+      this.dropdownDuracionAbierto = false;
+      if (this.form.fechaVisita) {
+        const partes = this.form.fechaVisita.split('-');
+        if (partes.length === 3) {
+          this.mesVisualizado = new Date(Number(partes[0]), Number(partes[1]) - 1, 1);
+        }
+      } else {
+        this.mesVisualizado = new Date();
+      }
+    }
+    this.cdr.markForCheck();
+  }
+
+  seleccionarFecha(fechaStr: string, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.form.fechaVisita = fechaStr;
+    this.calendarioAbierto = false;
+    this.cdr.markForCheck();
+  }
+
+  seleccionarHoy(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    const hoy = new Date();
+    this.form.fechaVisita = this.formatearFechaISO(hoy);
+    this.mesVisualizado = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    this.calendarioAbierto = false;
+    this.cdr.markForCheck();
+  }
+
+  limpiarFecha(event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.form.fechaVisita = '';
+    this.cdr.markForCheck();
+  }
+
+  toggleSelectorHora(event: MouseEvent): void {
+    event.stopPropagation();
+    this.selectorHoraAbierto = !this.selectorHoraAbierto;
+    if (this.selectorHoraAbierto) {
+      this.calendarioAbierto = false;
+      this.dropdownCuadrillaAbierto = false;
+      this.dropdownDuracionAbierto = false;
+    }
+    this.cdr.markForCheck();
+  }
+
+  seleccionarPresetHora(hora: string, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.form.horaVisita = hora;
+    this.selectorHoraAbierto = false;
+    this.cdr.markForCheck();
+  }
+
+  seleccionarHoraParte(parteHora: string, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    const actualMinuto = this.obtenerMinutoActual();
+    this.form.horaVisita = `${parteHora}:${actualMinuto}`;
+    this.cdr.markForCheck();
+  }
+
+  seleccionarMinutoParte(parteMinuto: string, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    const actualHora = this.obtenerHoraActual();
+    this.form.horaVisita = `${actualHora}:${parteMinuto}`;
+    this.selectorHoraAbierto = false;
+    this.cdr.markForCheck();
+  }
+
+  obtenerHoraActual(): string {
+    if (this.form.horaVisita && this.form.horaVisita.includes(':')) {
+      return this.form.horaVisita.split(':')[0];
+    }
+    return '09';
+  }
+
+  obtenerMinutoActual(): string {
+    if (this.form.horaVisita && this.form.horaVisita.includes(':')) {
+      return this.form.horaVisita.split(':')[1];
+    }
+    return '00';
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+    let cambio = false;
+
+    if (this.dropdownCuadrillaAbierto && this.cuadrillaDropdownRef) {
+      if (!this.cuadrillaDropdownRef.nativeElement.contains(target)) {
+        this.dropdownCuadrillaAbierto = false;
+        cambio = true;
+      }
+    }
+
+    if (this.dropdownDuracionAbierto && this.duracionDropdownRef) {
+      if (!this.duracionDropdownRef.nativeElement.contains(target)) {
+        this.dropdownDuracionAbierto = false;
+        cambio = true;
+      }
+    }
+
+    if (this.calendarioAbierto && this.calendarioDropdownRef) {
+      if (!this.calendarioDropdownRef.nativeElement.contains(target)) {
+        this.calendarioAbierto = false;
+        cambio = true;
+      }
+    }
+
+    if (this.selectorHoraAbierto && this.horaDropdownRef) {
+      if (!this.horaDropdownRef.nativeElement.contains(target)) {
+        this.selectorHoraAbierto = false;
+        cambio = true;
+      }
+    }
+
+    if (cambio) {
+      this.cdr.markForCheck();
+    }
   }
 
   volverAlPanel(): void {
@@ -240,7 +553,10 @@ export class GestionarReporteComponent implements OnInit {
       const direccionCodificada = encodeURIComponent(this.reporte.direccion.trim());
       window.open(`https://www.google.com/maps/search/?api=1&query=${direccionCodificada}`, '_blank');
     } else {
-      alert('Este reporte no registra una dirección en la base de datos.');
+      this.notificacionService.info(
+        'Sin dirección',
+        'Este reporte no registra una dirección en la base de datos.'
+      );
     }
   }
 

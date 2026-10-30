@@ -1,11 +1,1080 @@
-/* You can add global styles to this file, and also import other style files */
-html, body {
-  margin: 0;
-  padding: 0;
-  background-color: #f8fafc;
+/* ==========================================================================
+   SISTEMA DE DISEÑO GLOBAL - INSPIRADO EN SKYDASH
+   Estandarización de colores, tipografía, bordes, sombras, botones y componentes
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ==========================================================================
+   1. VARIABLES DE DISEÑO (DESIGN TOKENS EN :root)
+   ========================================================================== */
+:root {
+  /* -----------------------------------------------------------------------
+     1.1 COLORES PRIMARIOS Y DE MARCA (Paleta Skydash Minimal & Shades of Blue)
+     ----------------------------------------------------------------------- */
+  --color-primario: #4B49AC;                /* Royal / Indigo Skydash */
+  --color-primario-hover: #3f3d91;
+  --color-primario-activo: #35337b;
+  --color-primario-suave: #ECECF8;          /* Fondo suave para botones inversos y badges */
+  --color-primario-borde: #D5D4F5;          /* Borde coordinado morado */
+  --color-primario-sombra: rgba(75, 73, 172, 0.28);
+
+  --color-secundario: #7978E9;              /* Iris Violet Skydash */
+  --color-secundario-hover: #6766d6;
+  --color-secundario-activo: #5655bd;
+  --color-secundario-suave: #F1F1FD;
+  --color-secundario-sombra: rgba(121, 120, 233, 0.25);
+
+  --color-soporte-celeste: #7DA0FA;         /* Periwinkle Skydash */
+  --color-soporte-celeste-suave: #EDF3FE;
+  --color-soporte-cielo: #98BDFF;           /* Soft Sky Blue Skydash */
+  --color-soporte-cielo-suave: #F2F7FF;
+
+  /* -----------------------------------------------------------------------
+     1.2 COLORES DE ESTADO Y FEEDBACK (Semántica descriptiva)
+     ----------------------------------------------------------------------- */
+  /* Satisfacción / Éxito */
+  --color-satisfaccion: #57B657;            /* Success Green Skydash */
+  --color-satisfaccion-hover: #48a048;
+  --color-satisfaccion-activo: #3b873b;
+  --color-satisfaccion-suave: #E9F8E9;      /* Fondo tenue para alertas/badges */
+  --color-satisfaccion-borde: #A3E2A3;
+  --color-satisfaccion-sombra: rgba(87, 182, 87, 0.28);
+
+  /* Alerta / Peligro / Error */
+  --color-alerta: #FF4747;                  /* Coral Red Skydash */
+  --color-alerta-coral: #F3797E;            /* Salmon Coral Skydash */
+  --color-alerta-hover: #e53838;
+  --color-alerta-activo: #cc2929;
+  --color-alerta-suave: #FEECEE;
+  --color-alerta-borde: #FDC6CB;
+  --color-alerta-sombra: rgba(255, 71, 71, 0.28);
+
+  /* Advertencia / Precaución */
+  --color-advertencia: #FFC100;             /* Warning Gold Skydash */
+  --color-advertencia-hover: #e6ae00;
+  --color-advertencia-activo: #cc9a00;
+  --color-advertencia-suave: #FFF9E6;
+  --color-advertencia-borde: #FFE899;
+  --color-advertencia-sombra: rgba(255, 193, 0, 0.28);
+
+  /* Información */
+  --color-informacion: #248AFD;             /* Info Blue Skydash */
+  --color-informacion-hover: #1776df;
+  --color-informacion-activo: #1063c2;
+  --color-informacion-suave: #EAF3FE;
+  --color-informacion-borde: #A8CEFE;
+  --color-informacion-sombra: rgba(36, 138, 253, 0.28);
+
+  /* Neutros Oscuros y Claros */
+  --color-oscuro: #222437;                  /* Dark Skydash */
+  --color-oscuro-hover: #171825;
+  --color-oscuro-suave: #E7E8EB;
+  --color-claro: #F8F9FA;
+  --color-claro-hover: #E9ECEF;
+  --color-neutro-gris: #A3A4A5;
+
+  /* -----------------------------------------------------------------------
+     1.3 COLORES DE TEXTO (Descriptivos por jerarquía de contraste)
+     ----------------------------------------------------------------------- */
+  --color-texto-principal: #0F172A;         /* Títulos principales, lectura prioritaria */
+  --color-texto-regular: #334155;           /* Cuerpo de texto, párrafos */
+  --color-texto-secundario: #6C757D;         /* Subtítulos, labels secundarios, fechas */
+  --color-texto-atenuado: #94A3B8;          /* Placeholders, elementos deshabilitados */
+  --color-texto-blanco: #FFFFFF;
+  --color-texto-enlace: #4B49AC;
+  --color-texto-enlace-hover: #3f3d91;
+
+  /* -----------------------------------------------------------------------
+     1.4 FONDOS Y SUPERFICIES (Canvas & Surfaces)
+     ----------------------------------------------------------------------- */
+  --color-fondo-app: #F5F7FF;               /* Fondo característico Skydash */
+  --color-superficie-blanca: #FFFFFF;       /* Tarjetas, modales, barras */
+  --color-superficie-gris-suave: #F8FAFC;
+  --color-superficie-hover: #F1F4F9;
+
+  /* -----------------------------------------------------------------------
+     1.5 BORDES Y LÍNEAS DIVISORIAS
+     ----------------------------------------------------------------------- */
+  --color-borde-suave: #E2E8F0;             /* Borde estándar de tarjetas */
+  --color-borde-medio: #CBD5E1;             /* Borde de inputs y divisores */
+  --color-borde-fuerte: #94A3B8;
+
+  /* -----------------------------------------------------------------------
+     1.6 RADIO DE BORDES (Border Radius - Nomenclatura descriptiva)
+     ----------------------------------------------------------------------- */
+  --radio-borde-cero: 0px;
+  --radio-borde-xs: 4px;                    /* Mini tags, checkmarks */
+  --radio-borde-s: 6px;                     /* Badges, inputs pequeños */
+  --radio-borde-m: 10px;                    /* Botones estándar, inputs, mini cards */
+  --radio-borde-l: 14px;                    /* Tarjetas principales Skydash */
+  --radio-borde-xl: 20px;                   /* Modales, contenedores grandes */
+  --radio-borde-redondo: 9999px;            /* Botones redondeados / píldoras / avatares */
+
+  /* -----------------------------------------------------------------------
+     1.7 TAMAÑOS DE FUENTE (Font Size)
+     ----------------------------------------------------------------------- */
+  --tamano-fuente-xs: 0.75rem;              /* 12px - Tags, micro-labels */
+  --tamano-fuente-s: 0.84rem;               /* 13.5px - Metadatos, badges, subtítulos pequeños */
+  --tamano-fuente-base: 0.95rem;            /* 15.2px - Cuerpo de texto estándar */
+  --tamano-fuente-m: 1.05rem;               /* 16.8px - Subtítulos destacados, inputs */
+  --tamano-fuente-l: 1.25rem;               /* 20px - h4, títulos de sección */
+  --tamano-fuente-xl: 1.45rem;              /* 23px - h3, títulos medianos */
+  --tamano-fuente-2xl: 1.85rem;             /* 29.5px - h2, títulos de página */
+  --tamano-fuente-3xl: 2.35rem;             /* 37.6px - h1, títulos de gran impacto */
+
+  /* Displays (Grandes titulares Skydash) */
+  --tamano-display-1: 3.5rem;               /* 56px */
+  --tamano-display-2: 3.0rem;               /* 48px */
+  --tamano-display-3: 2.5rem;               /* 40px */
+  --tamano-display-4: 2.0rem;               /* 32px */
+
+  /* -----------------------------------------------------------------------
+     1.8 PESOS TIPOGRÁFICOS (Font Weight)
+     ----------------------------------------------------------------------- */
+  --peso-ligero: 300;
+  --peso-regular: 400;
+  --peso-medio: 500;
+  --peso-seminegrita: 600;
+  --peso-negrita: 700;
+  --peso-extranegrita: 800;
+
+  /* -----------------------------------------------------------------------
+     1.9 SOMBRAS (Box Shadows Skydash)
+     ----------------------------------------------------------------------- */
+  --sombra-xs: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --sombra-s: 0 2px 6px rgba(0, 0, 0, 0.04);
+  --sombra-m: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --sombra-l: 0 8px 24px rgba(0, 0, 0, 0.09);
+  --sombra-elevada: 0 12px 36px rgba(75, 73, 172, 0.12);
+
+  /* Sombras con brillo de color para botones hover */
+  --sombra-hover-primario: 0 4px 14px rgba(75, 73, 172, 0.35);
+  --sombra-hover-satisfaccion: 0 4px 14px rgba(87, 182, 87, 0.35);
+  --sombra-hover-alerta: 0 4px 14px rgba(255, 71, 71, 0.35);
+  --sombra-hover-advertencia: 0 4px 14px rgba(255, 193, 0, 0.35);
+  --sombra-hover-informacion: 0 4px 14px rgba(36, 138, 253, 0.35);
+
+  /* -----------------------------------------------------------------------
+     1.10 ESPACIADOS Y TRANSICIONES
+     ----------------------------------------------------------------------- */
+  --espacio-xs: 0.25rem;                    /* 4px */
+  --espacio-s: 0.5rem;                      /* 8px */
+  --espacio-m: 1rem;                        /* 16px */
+  --espacio-l: 1.5rem;                      /* 24px */
+  --espacio-xl: 2rem;                       /* 32px */
+  --espacio-2xl: 3rem;                      /* 48px */
+
+  /* Estándar universal de contenedor de página (referencia Trazabilidad) */
+  --ancho-maximo-pagina: 1420px;
+  --padding-lateral-pagina: var(--espacio-xl);      /* 2rem / 32px */
+  --padding-superior-pagina: 1.5rem;                /* 24px - Despeje armónico con header flotante */
+  --padding-inferior-pagina: var(--espacio-2xl);    /* 3rem / 48px */
+
+  --transicion-rapida: 0.15s ease;
+  --transicion-suave: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Fondos especiales para modales y overlays */
+  --fondo-backdrop: rgba(15, 16, 32, 0.52);
+}
+
+/* ==========================================================================
+   2. RESET Y ESTILOS BASE
+   ========================================================================== */
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-fondo-app);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-texto-regular);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Enlaces base */
+a {
+  color: var(--color-texto-enlace);
+  text-decoration: none;
+  transition: color var(--transicion-rapida);
+}
+
+a:hover {
+  color: var(--color-texto-enlace-hover);
+}
+
+/* ==========================================================================
+   3. TIPOGRAFÍA GLOBAL (HEADINGS, SUBHEADINGS, PARAGRAPHS, DISPLAYS)
+   ========================================================================== */
+
+/* Headings base */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  color: var(--color-texto-principal);
+  font-weight: var(--peso-negrita);
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+  letter-spacing: -0.3px;
+}
+
+h1, .h1 { font-size: var(--tamano-fuente-3xl); }
+h2, .h2 { font-size: var(--tamano-fuente-2xl); }
+h3, .h3 { font-size: var(--tamano-fuente-xl); }
+h4, .h4 { font-size: var(--tamano-fuente-l); }
+h5, .h5 { font-size: var(--tamano-fuente-m); }
+h6, .h6 { font-size: var(--tamano-fuente-base); }
+
+/* Soporte para texto secundario atenuado dentro de headings (Referencia Skydash) */
+h1 .texto-secundario, .h1 .texto-secundario,
+h2 .texto-secundario, .h2 .texto-secundario,
+h3 .texto-secundario, .h3 .texto-secundario,
+h4 .texto-secundario, .h4 .texto-secundario,
+h5 .texto-secundario, .h5 .texto-secundario,
+h6 .texto-secundario, .h6 .texto-secundario {
+  color: var(--color-texto-secundario);
+  font-weight: var(--peso-regular);
+  margin-left: 0.4rem;
+}
+
+/* Display Headings (Grandes titulares de banner / dashboard) */
+.titulo-display-1 {
+  font-size: var(--tamano-display-1);
+  font-weight: var(--peso-ligero);
+  line-height: 1.15;
+  color: var(--color-texto-principal);
+  letter-spacing: -1.2px;
+}
+
+.titulo-display-2 {
+  font-size: var(--tamano-display-2);
+  font-weight: var(--peso-ligero);
+  line-height: 1.15;
+  color: var(--color-texto-principal);
+  letter-spacing: -1px;
+}
+
+.titulo-display-3 {
+  font-size: var(--tamano-display-3);
+  font-weight: var(--peso-regular);
+  line-height: 1.2;
+  color: var(--color-texto-principal);
+  letter-spacing: -0.6px;
+}
+
+.titulo-display-4 {
+  font-size: var(--tamano-display-4);
+  font-weight: var(--peso-regular);
+  line-height: 1.25;
+  color: var(--color-texto-principal);
+  letter-spacing: -0.4px;
+}
+
+/* Párrafos y textos descriptivos */
+p, .texto-parrafo {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: var(--tamano-fuente-base);
+  color: var(--color-texto-regular);
+  line-height: 1.6;
+}
+
+/* Clases descriptivas de color de texto */
+.texto-principal {
+  color: var(--color-texto-principal) !important;
+}
+
+.texto-secundario {
+  color: var(--color-texto-secundario) !important;
+}
+
+.texto-atenuado {
+  color: var(--color-texto-atenuado) !important;
+}
+
+.texto-blanco {
+  color: var(--color-texto-blanco) !important;
+}
+
+.texto-primario {
+  color: var(--color-primario) !important;
+}
+
+.texto-satisfaccion {
+  color: var(--color-satisfaccion) !important;
+}
+
+.texto-alerta {
+  color: var(--color-alerta) !important;
+}
+
+.texto-advertencia {
+  color: var(--color-advertencia) !important;
+}
+
+.texto-informacion {
+  color: var(--color-informacion) !important;
+}
+
+/* Clases descriptivas de peso tipográfico */
+.texto-ligero       { font-weight: var(--peso-ligero) !important; }
+.texto-regular      { font-weight: var(--peso-regular) !important; }
+.texto-medio        { font-weight: var(--peso-medio) !important; }
+.texto-seminegrita  { font-weight: var(--peso-seminegrita) !important; }
+.texto-negrita      { font-weight: var(--peso-negrita) !important; }
+.texto-extranegrita { font-weight: var(--peso-extranegrita) !important; }
+
+/* Clases descriptivas de tamaño */
+.texto-xs   { font-size: var(--tamano-fuente-xs) !important; }
+.texto-s    { font-size: var(--tamano-fuente-s) !important; }
+.texto-base { font-size: var(--tamano-fuente-base) !important; }
+.texto-m    { font-size: var(--tamano-fuente-m) !important; }
+.texto-l    { font-size: var(--tamano-fuente-l) !important; }
+.texto-xl   { font-size: var(--tamano-fuente-xl) !important; }
+.texto-2xl  { font-size: var(--tamano-fuente-2xl) !important; }
+.texto-3xl  { font-size: var(--tamano-fuente-3xl) !important; }
+
+/* ==========================================================================
+   4. SISTEMA DE BOTONES SKYDASH (ESTÁNDAR UNIVERSAL)
+   ========================================================================== */
+
+/* Botón Base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-size: var(--tamano-fuente-s);
+  font-weight: var(--peso-seminegrita);
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.65rem 1.35rem;
+  border-radius: var(--radio-borde-m);
+  transition: all var(--transicion-suave);
+  outline: none;
+  text-decoration: none;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.65;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* -------------------------------------------------------------------------
+   4.1 BOTONES DE COLOR SÓLIDO (Single Color Buttons)
+   ------------------------------------------------------------------------- */
+.btn-primario {
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
+  color: var(--color-texto-blanco);
+}
+.btn-primario:hover {
+  background-color: var(--color-primario-hover);
+  border-color: var(--color-primario-hover);
+  box-shadow: var(--sombra-hover-primario);
+}
+
+.btn-secundario {
+  background-color: var(--color-neutro-gris);
+  border-color: var(--color-neutro-gris);
+  color: var(--color-texto-blanco);
+}
+.btn-secundario:hover {
+  background-color: #8f9091;
+  border-color: #8f9091;
+}
+
+.btn-satisfaccion,
+.btn-exito {
+  background-color: var(--color-satisfaccion);
+  border-color: var(--color-satisfaccion);
+  color: var(--color-texto-blanco);
+}
+.btn-satisfaccion:hover,
+.btn-exito:hover {
+  background-color: var(--color-satisfaccion-hover);
+  border-color: var(--color-satisfaccion-hover);
+  box-shadow: var(--sombra-hover-satisfaccion);
+}
+
+.btn-alerta,
+.btn-peligro {
+  background-color: var(--color-alerta);
+  border-color: var(--color-alerta);
+  color: var(--color-texto-blanco);
+}
+.btn-alerta:hover,
+.btn-peligro:hover {
+  background-color: var(--color-alerta-hover);
+  border-color: var(--color-alerta-hover);
+  box-shadow: var(--sombra-hover-alerta);
+}
+
+.btn-advertencia {
+  background-color: var(--color-advertencia);
+  border-color: var(--color-advertencia);
+  color: #212529;
+}
+.btn-advertencia:hover {
+  background-color: var(--color-advertencia-hover);
+  border-color: var(--color-advertencia-hover);
+  box-shadow: var(--sombra-hover-advertencia);
+}
+
+.btn-informacion {
+  background-color: var(--color-informacion);
+  border-color: var(--color-informacion);
+  color: var(--color-texto-blanco);
+}
+.btn-informacion:hover {
+  background-color: var(--color-informacion-hover);
+  border-color: var(--color-informacion-hover);
+  box-shadow: var(--sombra-hover-informacion);
+}
+
+.btn-oscuro {
+  background-color: var(--color-oscuro);
+  border-color: var(--color-oscuro);
+  color: var(--color-texto-blanco);
+}
+.btn-oscuro:hover {
+  background-color: var(--color-oscuro-hover);
+  border-color: var(--color-oscuro-hover);
+}
+
+.btn-claro {
+  background-color: var(--color-claro);
+  border-color: var(--color-borde-suave);
+  color: var(--color-texto-principal);
+}
+.btn-claro:hover {
+  background-color: var(--color-claro-hover);
+  border-color: var(--color-borde-medio);
+}
+
+.btn-enlace {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-primario);
+  padding-left: 0;
+  padding-right: 0;
+}
+.btn-enlace:hover {
+  color: var(--color-primario-hover);
+  text-decoration: underline;
+  transform: none;
+}
+
+/* -------------------------------------------------------------------------
+   4.2 BOTONES REDONDEADOS (Rounded Buttons / Pill)
+   ------------------------------------------------------------------------- */
+.btn-redondeado {
+  border-radius: var(--radio-borde-redondo) !important;
+  padding-left: 1.6rem !important;
+  padding-right: 1.6rem !important;
+}
+
+/* -------------------------------------------------------------------------
+   4.3 BOTONES DELINEADOS (Outlined Buttons)
+   ------------------------------------------------------------------------- */
+.btn-delineado-primario {
+  background-color: transparent;
+  border: 1.5px solid var(--color-primario);
+  color: var(--color-primario);
+}
+.btn-delineado-primario:hover {
+  background-color: var(--color-primario);
+  color: var(--color-texto-blanco);
+  box-shadow: var(--sombra-hover-primario);
+}
+
+.btn-delineado-secundario {
+  background-color: transparent;
+  border: 1.5px solid var(--color-neutro-gris);
+  color: var(--color-texto-secundario);
+}
+.btn-delineado-secundario:hover {
+  background-color: var(--color-neutro-gris);
+  color: var(--color-texto-blanco);
+}
+
+.btn-delineado-satisfaccion {
+  background-color: transparent;
+  border: 1.5px solid var(--color-satisfaccion);
+  color: var(--color-satisfaccion);
+}
+.btn-delineado-satisfaccion:hover {
+  background-color: var(--color-satisfaccion);
+  color: var(--color-texto-blanco);
+  box-shadow: var(--sombra-hover-satisfaccion);
+}
+
+.btn-delineado-alerta {
+  background-color: transparent;
+  border: 1.5px solid var(--color-alerta);
+  color: var(--color-alerta);
+}
+.btn-delineado-alerta:hover {
+  background-color: var(--color-alerta);
+  color: var(--color-texto-blanco);
+  box-shadow: var(--sombra-hover-alerta);
+}
+
+.btn-delineado-advertencia {
+  background-color: transparent;
+  border: 1.5px solid var(--color-advertencia);
+  color: #b38600;
+}
+.btn-delineado-advertencia:hover {
+  background-color: var(--color-advertencia);
+  color: #212529;
+}
+
+.btn-delineado-informacion {
+  background-color: transparent;
+  border: 1.5px solid var(--color-informacion);
+  color: var(--color-informacion);
+}
+.btn-delineado-informacion:hover {
+  background-color: var(--color-informacion);
+  color: var(--color-texto-blanco);
+  box-shadow: var(--sombra-hover-informacion);
+}
+
+.btn-delineado-oscuro {
+  background-color: transparent;
+  border: 1.5px solid var(--color-oscuro);
+  color: var(--color-oscuro);
+}
+.btn-delineado-oscuro:hover {
+  background-color: var(--color-oscuro);
+  color: var(--color-texto-blanco);
+}
+
+/* -------------------------------------------------------------------------
+   4.4 BOTONES INVERSOS / SUAVES (Inverse Buttons - Fondos pastel Skydash)
+   ------------------------------------------------------------------------- */
+.btn-inverso-primario {
+  background-color: var(--color-primario-suave);
+  border-color: transparent;
+  color: var(--color-primario);
+}
+.btn-inverso-primario:hover {
+  background-color: var(--color-primario);
+  color: var(--color-texto-blanco);
+}
+
+.btn-inverso-secundario {
+  background-color: var(--color-claro-hover);
+  border-color: transparent;
+  color: var(--color-texto-secundario);
+}
+.btn-inverso-secundario:hover {
+  background-color: var(--color-neutro-gris);
+  color: var(--color-texto-blanco);
+}
+
+.btn-inverso-satisfaccion {
+  background-color: var(--color-satisfaccion-suave);
+  border-color: transparent;
+  color: var(--color-satisfaccion);
+}
+.btn-inverso-satisfaccion:hover {
+  background-color: var(--color-satisfaccion);
+  color: var(--color-texto-blanco);
+}
+
+.btn-inverso-alerta {
+  background-color: var(--color-alerta-suave);
+  border-color: transparent;
+  color: var(--color-alerta);
+}
+.btn-inverso-alerta:hover {
+  background-color: var(--color-alerta);
+  color: var(--color-texto-blanco);
+}
+
+.btn-inverso-advertencia {
+  background-color: var(--color-advertencia-suave);
+  border-color: transparent;
+  color: #b38600;
+}
+.btn-inverso-advertencia:hover {
+  background-color: var(--color-advertencia);
+  color: #212529;
+}
+
+.btn-inverso-informacion {
+  background-color: var(--color-informacion-suave);
+  border-color: transparent;
+  color: var(--color-informacion);
+}
+.btn-inverso-informacion:hover {
+  background-color: var(--color-informacion);
+  color: var(--color-texto-blanco);
+}
+
+.btn-inverso-oscuro {
+  background-color: var(--color-oscuro-suave);
+  border-color: transparent;
+  color: var(--color-oscuro);
+}
+.btn-inverso-oscuro:hover {
+  background-color: var(--color-oscuro);
+  color: var(--color-texto-blanco);
+}
+
+/* -------------------------------------------------------------------------
+   4.5 TAMAÑOS DE BOTONES (Button Sizes)
+   ------------------------------------------------------------------------- */
+.btn-lg {
+  padding: 0.85rem 1.85rem;
+  font-size: var(--tamano-fuente-base);
+  border-radius: var(--radio-borde-l);
+}
+
+.btn-md {
+  padding: 0.65rem 1.35rem;
+  font-size: var(--tamano-fuente-s);
+  border-radius: var(--radio-borde-m);
+}
+
+.btn-sm {
+  padding: 0.42rem 0.95rem;
+  font-size: var(--tamano-fuente-xs);
+  border-radius: var(--radio-borde-s);
+}
+
+.btn-xs {
+  padding: 0.25rem 0.65rem;
+  font-size: var(--tamano-fuente-xs);
+  border-radius: var(--radio-borde-xs);
+}
+
+/* Botón de bloque completo (Full Width Block Button) */
+.btn-bloque,
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+/* -------------------------------------------------------------------------
+   4.6 BOTONES DE ICONO (Icon Buttons)
+   ------------------------------------------------------------------------- */
+.btn-icono {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radio-borde-m);
+}
+
+.btn-icono.btn-redondeado,
+.btn-icono-redondo {
+  border-radius: 50% !important;
+  width: 40px;
+  height: 40px;
+  padding: 0 !important;
+}
+
+.btn-icono-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.btn-icono-lg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Tamaños estándar de iconos */
+.icono-lg {
+  width: 28px;
+  height: 28px;
+}
+
+.icono-md {
+  width: 20px;
+  height: 20px;
+}
+
+.icono-sm {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==========================================================================
+   5. TARJETAS Y CONTENEDORES (CARDS SKYDASH)
+   ========================================================================== */
+.tarjeta,
+.tarjeta-skydash {
+  background-color: var(--color-superficie-blanca);
+  border: 1px solid var(--color-borde-suave);
+  border-radius: var(--radio-borde-l);
+  box-shadow: var(--sombra-s);
+  padding: 1.5rem 1.75rem;
+  transition: transform var(--transicion-suave), box-shadow var(--transicion-suave);
+}
+
+.tarjeta:hover,
+.tarjeta-skydash:hover {
+  box-shadow: var(--sombra-m);
+}
+
+.tarjeta-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--color-borde-suave);
+}
+
+.tarjeta-titulo {
+  font-size: var(--tamano-fuente-l);
+  font-weight: var(--peso-negrita);
+  color: var(--color-texto-principal);
+  margin: 0;
+}
+
+.tarjeta-subtitulo {
+  font-size: var(--tamano-fuente-s);
+  color: var(--color-texto-secundario);
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+.tarjeta-cuerpo {
+  padding: 0;
+}
+
+.tarjeta-pie {
+  margin-top: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--color-borde-suave);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ==========================================================================
+   6. INSIGNIAS Y DISTINTIVOS (BADGES & PILLS)
+   ========================================================================== */
+.insignia,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  font-size: var(--tamano-fuente-xs);
+  font-weight: var(--peso-negrita);
+  line-height: 1;
+  border-radius: var(--radio-borde-s);
+  white-space: nowrap;
+}
+
+.insignia-redonda,
+.badge-pildora {
+  border-radius: var(--radio-borde-redondo) !important;
+  padding: 0.32rem 0.85rem;
+}
+
+/* Insignias sólidas */
+.insignia-primaria     { background-color: var(--color-primario); color: var(--color-texto-blanco); }
+.insignia-secundaria   { background-color: var(--color-secundario); color: var(--color-texto-blanco); }
+.insignia-satisfaccion { background-color: var(--color-satisfaccion); color: var(--color-texto-blanco); }
+.insignia-alerta       { background-color: var(--color-alerta); color: var(--color-texto-blanco); }
+.insignia-advertencia  { background-color: var(--color-advertencia); color: #212529; }
+.insignia-informacion  { background-color: var(--color-informacion); color: var(--color-texto-blanco); }
+
+/* Insignias suaves / inversas (Estilo Skydash) */
+.insignia-suave-primaria {
+  background-color: var(--color-primario-suave);
+  color: var(--color-primario);
+}
+
+.insignia-suave-satisfaccion {
+  background-color: var(--color-satisfaccion-suave);
+  color: var(--color-satisfaccion);
+}
+
+.insignia-suave-alerta {
+  background-color: var(--color-alerta-suave);
+  color: var(--color-alerta);
+}
+
+.insignia-suave-advertencia {
+  background-color: var(--color-advertencia-suave);
+  color: #b38600;
+}
+
+.insignia-suave-informacion {
+  background-color: var(--color-informacion-suave);
+  color: var(--color-informacion);
+}
+
+/* ==========================================================================
+   7. FORMULARIOS Y CONTROLES ESTANDARIZADOS
+   ========================================================================== */
+.grupo-formulario {
+  margin-bottom: 1.25rem;
+}
+
+.etiqueta-formulario {
+  display: block;
+  font-size: var(--tamano-fuente-s);
+  font-weight: var(--peso-seminegrita);
+  color: var(--color-texto-principal);
+  margin-bottom: 0.45rem;
+}
+
+.etiqueta-formulario .requerido {
+  color: var(--color-alerta);
+  margin-left: 2px;
+}
+
+.control-formulario {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  font-family: inherit;
+  font-size: var(--tamano-fuente-base);
+  color: var(--color-texto-principal);
+  background-color: var(--color-superficie-blanca);
+  border: 1px solid var(--color-borde-medio);
+  border-radius: var(--radio-borde-m);
+  transition: border-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
+  outline: none;
+}
+
+.control-formulario:focus {
+  border-color: var(--color-primario);
+  box-shadow: 0 0 0 3px var(--color-primario-sombra);
+}
+
+.control-formulario::placeholder {
+  color: var(--color-texto-atenuado);
+}
+
+.control-formulario:disabled,
+.control-formulario[disabled] {
+  background-color: var(--color-superficie-gris-suave);
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.texto-ayuda-formulario {
+  font-size: var(--tamano-fuente-xs);
+  color: var(--color-texto-secundario);
+  margin-top: 0.35rem;
+}
+
+/* ==========================================================================
+   8. UTILIDADES DE ESPACIADO, FLEX Y GRID
+   ========================================================================== */
+.d-flex         { display: flex !important; }
+.d-inline-flex  { display: inline-flex !important; }
+.d-grid         { display: grid !important; }
+.d-block        { display: block !important; }
+.d-none         { display: none !important; }
+
+.flex-column    { flex-direction: column !important; }
+.flex-row       { flex-direction: row !important; }
+.flex-wrap      { flex-wrap: wrap !important; }
+
+.align-center   { align-items: center !important; }
+.align-start    { align-items: flex-start !important; }
+.align-end      { align-items: flex-end !important; }
+
+.justify-center { justify-content: center !important; }
+.justify-between{ justify-content: space-between !important; }
+.justify-end    { justify-content: flex-end !important; }
+.justify-start  { justify-content: flex-start !important; }
+
+/* Gaps */
+.gap-xs { gap: var(--espacio-xs) !important; }
+.gap-s  { gap: var(--espacio-s) !important; }
+.gap-m  { gap: var(--espacio-m) !important; }
+.gap-l  { gap: var(--espacio-l) !important; }
+.gap-xl { gap: var(--espacio-xl) !important; }
+
+/* Margins y Paddings */
+.m-0 { margin: 0 !important; }
+.p-0 { padding: 0 !important; }
+.mb-1 { margin-bottom: var(--espacio-xs) !important; }
+.mb-2 { margin-bottom: var(--espacio-s) !important; }
+.mb-3 { margin-bottom: var(--espacio-m) !important; }
+.mb-4 { margin-bottom: var(--espacio-l) !important; }
+.mb-5 { margin-bottom: var(--espacio-xl) !important; }
+
+/* Contenedor de página estandarizado */
+.contenedor-pagina {
+  max-width: var(--ancho-maximo-pagina);
+  margin: 0 auto;
+  padding: var(--padding-superior-pagina) var(--padding-lateral-pagina) var(--padding-inferior-pagina);
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .contenedor-pagina {
+    padding: 1.25rem 1rem 3rem;
+  }
+}
+
+/* ==========================================================================
+   8. ANIMACIONES Y PULSOS GLOBALES
+   ========================================================================== */
+@keyframes radarPulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--pulse-color, var(--color-primario-sombra));
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+@keyframes urgencyPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.75;
+  }
+}
+
+/* ==========================================================================
+   9. TEMA OSCURO (DARK MODE SKYDASH)
+   Sobrescritura de tokens de diseño para data-theme="dark" y body.dark-mode
+   ========================================================================== */
+html[data-theme="dark"],
+body.dark-mode {
+  /* Fondos y Canvas */
+  --color-fondo-app: #0F1020;               /* Canvas nocturno profundo Skydash */
+  --color-superficie-blanca: #1A1C33;       /* Tarjetas, modales y módulos */
+  --color-superficie-gris-suave: #222544;   /* Inputs, cajas de cita, subpaneles */
+  --color-superficie-hover: #2B2F56;
+
+  /* Textos de alto contraste y legibilidad */
+  --color-texto-principal: #F8FAFC;         /* Títulos principales y lectura alta */
+  --color-texto-regular: #CBD5E1;           /* Párrafos y textos descriptivos */
+  --color-texto-secundario: #94A3B8;        /* Metadatos, subtítulos atenuados */
+  --color-texto-atenuado: #64748B;          /* Placeholders */
+  --color-texto-enlace: #98BDFF;
+  --color-texto-enlace-hover: #C5D8FF;
+
+  /* Bordes nocturnos */
+  --color-borde-suave: #2A2E54;
+  --color-borde-medio: #3A4072;
+  --color-borde-fuerte: #525B9E;
+
+  /* Acentos de Marca (Luminosidad calibrada para fondos oscuros) */
+  --color-primario: #7978E9;
+  --color-primario-hover: #8F8EEF;
+  --color-primario-activo: #6766D6;
+  --color-primario-suave: rgba(121, 120, 233, 0.16);
+  --color-primario-borde: rgba(121, 120, 233, 0.35);
+  --color-primario-sombra: rgba(121, 120, 233, 0.35);
+
+  --color-secundario: #98BDFF;
+  --color-secundario-hover: #B0CEFF;
+  --color-secundario-suave: rgba(152, 189, 255, 0.14);
+
+  --color-soporte-celeste: #7DA0FA;
+  --color-soporte-celeste-suave: rgba(125, 160, 250, 0.15);
+  --color-soporte-cielo: #98BDFF;
+  --color-soporte-cielo-suave: rgba(152, 189, 255, 0.12);
+
+  /* Feedback en Dark Mode */
+  --color-satisfaccion-suave: rgba(87, 182, 87, 0.16);
+  --color-satisfaccion-borde: rgba(87, 182, 87, 0.35);
+
+  --color-alerta-suave: rgba(255, 71, 71, 0.16);
+  --color-alerta-borde: rgba(255, 71, 71, 0.35);
+
+  --color-advertencia-suave: rgba(255, 193, 0, 0.16);
+  --color-advertencia-borde: rgba(255, 193, 0, 0.35);
+
+  --color-informacion-suave: rgba(36, 138, 253, 0.16);
+  --color-informacion-borde: rgba(36, 138, 253, 0.35);
+
+  /* Neutros */
+  --color-claro: #222544;
+  --color-claro-hover: #292D54;
+  --color-oscuro: #0B0C17;
+
+  /* Sombras oscuras con profundidad */
+  --sombra-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --sombra-s: 0 3px 8px rgba(0, 0, 0, 0.45);
+  --sombra-m: 0 6px 18px rgba(0, 0, 0, 0.55);
+  --sombra-l: 0 10px 30px rgba(0, 0, 0, 0.65);
+  --sombra-elevada: 0 14px 40px rgba(0, 0, 0, 0.75);
+
+  --fondo-backdrop: rgba(5, 6, 15, 0.75);
+}
+
+/* ==========================================================================
+   9.1 TRANSICIÓN FLUIDA Y CINEMATOGRÁFICA ENTRE TEMAS (COLOR MORPH)
+   Se activa únicamente durante el cambio de tema para interpolar fondos,
+   textos, bordes y sombras con suavidad, liberando los micro-eventos de
+   la interfaz una vez concluida la transición (500ms).
+   ========================================================================== */
+html.theme-transitioning,
+html.theme-transitioning *:not(.theme-switch):not(.theme-switch *),
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              fill 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              stroke 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition-delay: 0s !important;
+}
+
+/* Preservar intacta la física de resorte y deslizamiento del interruptor de tema */
+html.theme-transitioning .theme-switch {
+  transition: background-color 0.38s ease, border-color 0.38s ease, box-shadow 0.38s ease, transform 0.15s ease !important;
+}
+
+html.theme-transitioning .switch-thumb {
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.38s ease,
+              box-shadow 0.38s ease,
+              color 0.38s ease !important;
+}
+
+html.theme-transitioning .thumb-svg {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }

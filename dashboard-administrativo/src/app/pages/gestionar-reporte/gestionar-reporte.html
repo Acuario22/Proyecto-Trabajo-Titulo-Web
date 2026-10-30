@@ -3,8 +3,6 @@
   [mostrarVolver]="true" 
   titulo="Gestión operativa" 
   subtitulo="Orden de Trabajo e Inspección"
-  perfilTexto="Perfil administrador"
-  [mostrarEstado]="false"
   (volver)="volverAlPanel()">
 </app-header>
 
@@ -37,12 +35,20 @@
   <!-- Encabezado de Página -->
   <section class="page-heading">
     <div class="page-heading-left">
-      <span class="sub-category-tag">RESOLUCIÓN DE INCIDENCIA</span>
       <h2 class="page-main-title">Gestionar reporte</h2>
       <p class="page-main-subtitle">Programa la atención y asigna los recursos necesarios en terreno.</p>
     </div>
     <div class="page-heading-right">
-      <span class="code-badge">{{ reporte.codigo }}</span>
+      <span class="code-badge-hero">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="9" x2="20" y2="9"></line>
+          <line x1="4" y1="15" x2="20" y2="15"></line>
+          <line x1="10" y1="3" x2="8" y2="21"></line>
+          <line x1="16" y1="3" x2="14" y2="21"></line>
+        </svg>
+        <span>{{ reporte.codigo }}</span>
+      </span>
     </div>
   </section>
 
@@ -58,12 +64,26 @@
           <div class="incident-tags">
             <span class="tag-category">{{ reporte.categoria || 'Sin Categoría' }}</span>
             <span class="tag-urgency" [ngClass]="obtenerClaseUrgencia(reporte.urgencia)">
+              <span class="status-dot"></span>
               {{ reporte.urgencia || 'Urgencia no definida' }}
             </span>
+            <span class="tag-sentiment" [ngClass]="obtenerClaseSentimiento(reporte.sentimiento)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9"></line>
+              </svg>
+              <span>{{ reporte.sentimiento || 'Neutral' }}</span>
+            </span>
           </div>
-          <div class="status-box">
-            <span class="status-box-label">Estado actual</span>
-            <span class="status-box-value">{{ reporte.estado || 'No Iniciado' }}</span>
+          <div class="status-pill-wrap">
+            <span class="status-pill-label">Estado actual:</span>
+            <span class="tag-estado" [ngClass]="obtenerClaseEstado(reporte.estado)">
+              <span class="status-dot"></span>
+              {{ reporte.estado || 'No Iniciado' }}
+            </span>
           </div>
         </div>
 
@@ -88,24 +108,60 @@
             <div class="form-grid-2">
               <div class="form-group">
                 <label class="form-label" for="cuadrilla">Cuadrilla especializada <span class="required">*</span></label>
-                <div class="select-wrapper">
-                  <select id="cuadrilla" class="form-control" [(ngModel)]="form.cuadrilla" name="cuadrilla" required>
-                    <option value="" disabled selected>Seleccionar cuadrilla</option>
-                    @for (c of cuadrillas; track c) {
-                      <option [value]="c">{{ c }}</option>
-                    }
-                  </select>
+                <div class="custom-dropdown-container" #cuadrillaDropdownRef>
+                  <button type="button" 
+                          id="cuadrilla" 
+                          class="custom-dropdown-trigger" 
+                          [class.is-open]="dropdownCuadrillaAbierto"
+                          [class.has-value]="!!form.cuadrilla"
+                          [class.campo-invalido]="intentadoGuardar && !form.cuadrilla"
+                          (click)="toggleDropdownCuadrilla($event)"
+                          aria-haspopup="listbox"
+                          [attr.aria-expanded]="dropdownCuadrillaAbierto">
+                    <span class="dropdown-trigger-label">
+                      {{ form.cuadrilla || 'Seleccionar cuadrilla' }}
+                    </span>
+                    <svg class="dropdown-arrow" [class.rotated]="dropdownCuadrillaAbierto" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
+
+                  @if (dropdownCuadrillaAbierto) {
+                    <div class="custom-dropdown-menu" role="listbox">
+                      <div class="dropdown-menu-header">
+                        <span class="dropdown-menu-title">Cuadrillas disponibles</span>
+                      </div>
+                      <div class="dropdown-menu-options">
+                        @for (c of cuadrillas; track c; let i = $index) {
+                          <button type="button" 
+                                  class="dropdown-option-btn" 
+                                  [class.is-selected]="form.cuadrilla === c"
+                                  [style.animation-delay]="(i * 0.035) + 's'"
+                                  (click)="seleccionarCuadrilla(c)"
+                                  role="option" 
+                                  [attr.aria-selected]="form.cuadrilla === c">
+                            <span class="option-name">{{ c }}</span>
+                            @if (form.cuadrilla === c) {
+                              <svg class="option-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            }
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="responsable">Responsable de cuadrilla <span class="required">*</span></label>
-                <input id="responsable" type="text" class="form-control" placeholder="Nombre completo del encargado" [(ngModel)]="form.responsable" name="responsable" required>
+                <input id="responsable" type="text" class="form-control" [class.campo-invalido]="intentadoGuardar && !form.responsable" placeholder="Nombre completo del encargado" [(ngModel)]="form.responsable" name="responsable" required>
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="cantidadPersonal">Cantidad de personal <span class="required">*</span></label>
-                <input id="cantidadPersonal" type="number" min="1" class="form-control" placeholder="Ej. 4" [(ngModel)]="form.cantidadPersonal" name="cantidadPersonal" required>
+                <input id="cantidadPersonal" type="number" min="1" class="form-control" [class.campo-invalido]="intentadoGuardar && (!form.cantidadPersonal || form.cantidadPersonal < 1)" placeholder="Ej. 4" [(ngModel)]="form.cantidadPersonal" name="cantidadPersonal" required>
               </div>
 
               <div class="form-group">
@@ -126,25 +182,195 @@
             </div>
 
             <div class="form-grid-3">
+              <!-- Selector de Fecha de Visita Personalizado -->
               <div class="form-group">
-                <label class="form-label" for="fecha">Fecha de visita <span class="required">*</span></label>
-                <input id="fecha" type="date" class="form-control" [(ngModel)]="form.fechaVisita" name="fechaVisita" required>
+                <label class="form-label" for="fecha-trigger">Fecha de visita <span class="required">*</span></label>
+                <div class="custom-picker-container" #calendarioDropdownRef>
+                  <button type="button" 
+                          id="fecha-trigger" 
+                          class="custom-dropdown-trigger custom-picker-trigger" 
+                          [class.is-open]="calendarioAbierto"
+                          [class.has-value]="!!form.fechaVisita"
+                          [class.campo-invalido]="intentadoGuardar && !form.fechaVisita"
+                          (click)="toggleCalendario($event)"
+                          aria-haspopup="dialog"
+                          [attr.aria-expanded]="calendarioAbierto">
+                    <span class="dropdown-trigger-label">
+                      {{ formatearFechaLegible(form.fechaVisita) || 'Seleccionar fecha' }}
+                    </span>
+                    <svg class="picker-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </button>
+
+                  @if (calendarioAbierto) {
+                    <div class="custom-calendar-popup" role="dialog" (click)="$event.stopPropagation()">
+                      <div class="calendar-header">
+                        <button type="button" class="btn-cal-nav" (click)="cambiarMes(-1, $event)" title="Mes anterior">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                          </svg>
+                        </button>
+                        <span class="calendar-month-title">{{ nombreMesVisualizado }}</span>
+                        <button type="button" class="btn-cal-nav" (click)="cambiarMes(1, $event)" title="Mes siguiente">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div class="calendar-weekdays">
+                        @for (d of diasSemana; track d) {
+                          <span class="calendar-weekday">{{ d }}</span>
+                        }
+                      </div>
+
+                      <div class="calendar-days-grid">
+                        @for (item of diasCalendario; track item.fechaStr) {
+                          <button type="button" 
+                                  class="calendar-day-btn" 
+                                  [class.other-month]="!item.esMesActual"
+                                  [class.is-today]="item.esHoy"
+                                  [class.is-selected]="item.esSeleccionado"
+                                  (click)="seleccionarFecha(item.fechaStr, $event)">
+                            {{ item.dia }}
+                          </button>
+                        }
+                      </div>
+
+                      <div class="calendar-footer">
+                        <button type="button" class="btn-cal-action" (click)="seleccionarHoy($event)">Hoy</button>
+                        @if (form.fechaVisita) {
+                          <button type="button" class="btn-cal-action text-danger" (click)="limpiarFecha($event)">Limpiar</button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
 
+              <!-- Selector de Hora de Visita Personalizado -->
               <div class="form-group">
-                <label class="form-label" for="hora">Hora de visita <span class="required">*</span></label>
-                <input id="hora" type="time" class="form-control" [(ngModel)]="form.horaVisita" name="horaVisita" required>
+                <label class="form-label" for="hora-trigger">Hora de visita <span class="required">*</span></label>
+                <div class="custom-picker-container" #horaDropdownRef>
+                  <button type="button" 
+                          id="hora-trigger" 
+                          class="custom-dropdown-trigger custom-picker-trigger" 
+                          [class.is-open]="selectorHoraAbierto"
+                          [class.has-value]="!!form.horaVisita"
+                          [class.campo-invalido]="intentadoGuardar && !form.horaVisita"
+                          (click)="toggleSelectorHora($event)"
+                          aria-haspopup="dialog"
+                          [attr.aria-expanded]="selectorHoraAbierto">
+                    <span class="dropdown-trigger-label">
+                      {{ form.horaVisita || 'Seleccionar hora' }}
+                    </span>
+                    <svg class="picker-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </button>
+
+                  @if (selectorHoraAbierto) {
+                    <div class="custom-time-popup" role="dialog" (click)="$event.stopPropagation()">
+                      <div class="time-presets-header">
+                        <span class="time-section-title">Horarios habituales</span>
+                        <div class="time-presets-chips">
+                          @for (preset of horasPresets; track preset) {
+                            <button type="button" 
+                                    class="time-preset-chip" 
+                                    [class.is-selected]="form.horaVisita === preset"
+                                    (click)="seleccionarPresetHora(preset, $event)">
+                              {{ preset }}
+                            </button>
+                          }
+                        </div>
+                      </div>
+
+                      <div class="time-columns-wrapper">
+                        <div class="time-column">
+                          <span class="time-column-title">Hora</span>
+                          <div class="time-column-scroll">
+                            @for (h of horasDisponibles; track h) {
+                              <button type="button" 
+                                      class="time-digit-btn" 
+                                      [class.is-selected]="obtenerHoraActual() === h"
+                                      (click)="seleccionarHoraParte(h, $event)">
+                                {{ h }}
+                              </button>
+                            }
+                          </div>
+                        </div>
+
+                        <div class="time-column-divider">:</div>
+
+                        <div class="time-column">
+                          <span class="time-column-title">Minuto</span>
+                          <div class="time-column-scroll">
+                            @for (m of minutosDisponibles; track m) {
+                              <button type="button" 
+                                      class="time-digit-btn" 
+                                      [class.is-selected]="obtenerMinutoActual() === m"
+                                      (click)="seleccionarMinutoParte(m, $event)">
+                                {{ m }}
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="duracion">Duración estimada <span class="required">*</span></label>
-                <div class="select-wrapper">
-                  <select id="duracion" class="form-control" [(ngModel)]="form.duracionEstimada" name="duracionEstimada" required>
-                    <option value="" disabled selected>Seleccionar duración</option>
-                    @for (d of duraciones; track d) {
-                      <option [value]="d">{{ d }}</option>
-                    }
-                  </select>
+                <div class="custom-dropdown-container" #duracionDropdownRef>
+                  <button type="button" 
+                          id="duracion" 
+                          class="custom-dropdown-trigger" 
+                          [class.is-open]="dropdownDuracionAbierto"
+                          [class.has-value]="!!form.duracionEstimada"
+                          [class.campo-invalido]="intentadoGuardar && !form.duracionEstimada"
+                          (click)="toggleDropdownDuracion($event)"
+                          aria-haspopup="listbox"
+                          [attr.aria-expanded]="dropdownDuracionAbierto">
+                    <span class="dropdown-trigger-label">
+                      {{ form.duracionEstimada || 'Seleccionar duración' }}
+                    </span>
+                    <svg class="dropdown-arrow" [class.rotated]="dropdownDuracionAbierto" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
+
+                  @if (dropdownDuracionAbierto) {
+                    <div class="custom-dropdown-menu" role="listbox">
+                      <div class="dropdown-menu-header">
+                        <span class="dropdown-menu-title">Tiempos de resolución</span>
+                      </div>
+                      <div class="dropdown-menu-options">
+                        @for (d of duraciones; track d; let i = $index) {
+                          <button type="button" 
+                                  class="dropdown-option-btn" 
+                                  [class.is-selected]="form.duracionEstimada === d"
+                                  [style.animation-delay]="(i * 0.035) + 's'"
+                                  (click)="seleccionarDuracion(d)"
+                                  role="option" 
+                                  [attr.aria-selected]="form.duracionEstimada === d">
+                            <span class="option-name">{{ d }}</span>
+                            @if (form.duracionEstimada === d) {
+                              <svg class="option-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            }
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
             </div>
@@ -167,13 +393,12 @@
 
             <div class="form-group">
               <label class="form-label" for="instrucciones">Instrucciones para la cuadrilla <span class="required">*</span></label>
-              <textarea id="instrucciones" rows="4" class="form-control textarea-control" placeholder="Describe el alcance de los trabajos, medidas de seguridad vial y resultado esperado..." [(ngModel)]="form.instrucciones" name="instrucciones" required></textarea>
+              <textarea id="instrucciones" rows="4" class="form-control textarea-control" [class.campo-invalido]="intentadoGuardar && !form.instrucciones" placeholder="Describe el alcance de los trabajos, medidas de seguridad vial y resultado esperado..." [(ngModel)]="form.instrucciones" name="instrucciones" required></textarea>
             </div>
           </div>
 
           <!-- Barra Inferior de Acciones -->
           <footer class="form-card-footer">
-            <span class="footer-note">Se registrará en TBLORDENTRABAJO y se avanzará el reporte a estado Iniciado</span>
             <div class="footer-buttons">
               <button type="button" class="btn-cancel" (click)="cancelar()" [disabled]="guardandoOrden">Cancelar</button>
               <button type="submit" class="btn-submit" [disabled]="guardandoOrden">
@@ -200,7 +425,7 @@
         
         <div class="location-box">
           <div class="location-header-row">
-            <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="location-pin-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>

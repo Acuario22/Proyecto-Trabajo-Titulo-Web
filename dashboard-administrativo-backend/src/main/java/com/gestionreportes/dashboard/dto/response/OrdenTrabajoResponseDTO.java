@@ -24,7 +24,7 @@ public class OrdenTrabajoResponseDTO {
     @Schema(description = "ID del reporte asociado", example = "1")
     private Integer idReporte;
 
-    @Schema(description = "Código de negocio del reporte", example = "RPT-2024-0001")
+    @Schema(description = "Código de negocio del reporte", example = "RPT-2026-0001")
     private String codigoReporte;
 
     @Schema(description = "Nombre de la cuadrilla asignada", example = "Cuadrilla de Obras Viales (Pavimentación)")

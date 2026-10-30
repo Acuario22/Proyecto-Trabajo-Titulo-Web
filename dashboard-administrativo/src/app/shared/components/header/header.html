@@ -32,23 +32,58 @@
       </div>
     </div>
 
-    <!-- Lado Derecho: Estado del sistema / Perfil / Proyección de contenido -->
+    <!-- Lado Derecho: Opción modo oscuro + Perfil de administrador -->
     <div class="topbar-right">
       <ng-content></ng-content>
 
-      @if (perfilTexto) {
+      @if (mostrarSelectorTema) {
+        <button 
+          type="button" 
+          class="theme-switch" 
+          [class.dark-active]="temaService.esModoOscuro()" 
+          (click)="alternarTema()" 
+          [attr.title]="temaService.esModoOscuro() ? 'Modo oscuro activado · Clic para cambiar a modo claro' : 'Modo claro activado · Clic para cambiar a modo oscuro'"
+          [attr.aria-label]="temaService.esModoOscuro() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+          role="switch"
+          [attr.aria-checked]="temaService.esModoOscuro()">
+          
+          <!-- Icono Sol sutil en pista izquierda -->
+          <span class="track-icon track-sun" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
+          </span>
+
+          <!-- Icono Luna sutil en pista derecha -->
+          <span class="track-icon track-moon" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </span>
+
+          <!-- Thumb Deslizante con Gradiente Activo y Brillo Glow -->
+          <span class="switch-thumb">
+            @if (temaService.esModoOscuro()) {
+              <svg class="thumb-svg thumb-moon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            } @else {
+              <svg class="thumb-svg thumb-sun" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" fill="none"></path>
+              </svg>
+            }
+          </span>
+        </button>
+      }
+
+      @if (mostrarPerfil && perfilTexto) {
         <div class="profile-pill">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
           </svg>
           <span>{{ perfilTexto }}</span>
-        </div>
-      }
-
-      @if (mostrarEstado) {
-        <div class="status-indicator">
-          <span class="status-dot"></span>
-          <span class="status-text">{{ textoEstado }}</span>
         </div>
       }
     </div>
