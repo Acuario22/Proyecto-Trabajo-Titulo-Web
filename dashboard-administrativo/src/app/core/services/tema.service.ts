@@ -50,7 +50,7 @@ export class TemaService {
 
     this.timeoutTransicion = setTimeout(() => {
       document.documentElement.classList.remove('theme-transitioning');
-    }, 500);
+    }, 240);
   }
 
   /**

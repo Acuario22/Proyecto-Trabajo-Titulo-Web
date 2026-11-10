@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, Subject, timer, interval, forkJoin } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 import {
@@ -9,6 +9,7 @@ import {
   CategoriaConteo,
   DashboardMetricas
 } from '../../core/services/reporte.service';
+import { PanelEstadoService } from '../../core/services/panel-estado.service';
 
 import { HeaderComponent } from '../../shared/components/header/header';
 import { ReporteDetalleModalComponent } from '../../shared/components/reporte-detalle-modal/reporte-detalle-modal';
@@ -32,7 +33,9 @@ export type { Reporte };
 })
 export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterViewInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private reporteService = inject(ReporteService);
+  private panelEstadoService = inject(PanelEstadoService);
   private cdr = inject(ChangeDetectorRef);
   private subReportes?: Subscription;
 
@@ -135,6 +138,8 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
   cambiarPagina(nuevaPagina: number): void {
     if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginas && nuevaPagina !== this.paginaActual) {
       this.paginaActual = nuevaPagina;
+      this.panelEstadoService.actualizarPagina(nuevaPagina);
+      this.sincronizarQueryParams();
       this.cdr.markForCheck();
     }
   }
@@ -145,6 +150,9 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
   cambiarTamanoPagina(nuevoTamano: number): void {
     this.tamanoPagina = Number(nuevoTamano);
     this.paginaActual = 1;
+    this.panelEstadoService.actualizarTamanoPagina(this.tamanoPagina);
+    this.panelEstadoService.actualizarPagina(1);
+    this.sincronizarQueryParams();
     this.cdr.markForCheck();
   }
 
@@ -193,9 +201,45 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
   private timerRelativoSub?: Subscription;
 
   ngOnInit(): void {
+    // 1. Restaurar estado persistido desde PanelEstadoService
+    this.categoriaSeleccionada = this.panelEstadoService.categoria;
+    this.estadoSeleccionado = this.panelEstadoService.idEstado;
+    this.paginaActual = this.panelEstadoService.pagina;
+    this.tamanoPagina = this.panelEstadoService.tamanoPagina;
+    this.intervaloSeleccionado = this.panelEstadoService.intervaloRecarga;
+
+    // 2. Si vienen queryParams en la URL (ej. deep linking o retroceso del navegador), tienen precedencia
+    const qp = this.route.snapshot.queryParams;
+    if (qp['categoria']) {
+      this.categoriaSeleccionada = qp['categoria'];
+      this.panelEstadoService.actualizarCategoria(this.categoriaSeleccionada);
+    }
+    if (qp['estado'] !== undefined && qp['estado'] !== null) {
+      const parsedEstado = qp['estado'] === '' || qp['estado'] === 'null' ? null : Number(qp['estado']);
+      if (parsedEstado === null || [1, 2, 3, 4].includes(parsedEstado)) {
+        this.estadoSeleccionado = parsedEstado;
+        this.panelEstadoService.actualizarEstado(parsedEstado);
+      }
+    }
+    if (qp['pagina']) {
+      const parsedPag = Number(qp['pagina']);
+      if (!isNaN(parsedPag) && parsedPag >= 1) {
+        this.paginaActual = parsedPag;
+        this.panelEstadoService.actualizarPagina(parsedPag);
+      }
+    }
+    if (qp['tamano']) {
+      const parsedTam = Number(qp['tamano']);
+      if (this.opcionesTamanoPagina.includes(parsedTam)) {
+        this.tamanoPagina = parsedTam;
+        this.panelEstadoService.actualizarTamanoPagina(parsedTam);
+      }
+    }
+
+    this.sincronizarQueryParams();
     this.cargarCategorias();
     this.cargarMetricas();
-    this.cargarReportes(this.categoriaSeleccionada);
+    this.cargarReportes(this.categoriaSeleccionada, this.estadoSeleccionado);
     this.iniciarTemporizadorRelativo();
     this.cambiarIntervalo(this.intervaloSeleccionado);
   }
@@ -315,6 +359,7 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
    */
   cambiarIntervalo(segundos: number): void {
     this.intervaloSeleccionado = Number(segundos);
+    this.panelEstadoService.actualizarIntervalo(this.intervaloSeleccionado);
     this.autoRefreshSub?.unsubscribe();
 
     if (this.intervaloSeleccionado > 0) {
@@ -449,7 +494,9 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
         next: (data) => {
           this.reportes = data ?? [];
           if (this.paginaActual > this.totalPaginas) {
-            this.paginaActual = 1;
+            this.paginaActual = Math.max(1, this.totalPaginas);
+            this.panelEstadoService.actualizarPagina(this.paginaActual);
+            this.sincronizarQueryParams();
           }
           this.cargandoReportes = false;
           this.ultimaActualizacion = new Date();
@@ -481,6 +528,9 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
     }
     this.categoriaSeleccionada = categoria;
     this.paginaActual = 1;
+    this.panelEstadoService.actualizarCategoria(categoria);
+    this.panelEstadoService.actualizarPagina(1);
+    this.sincronizarQueryParams();
     this.cargarReportes(categoria, this.estadoSeleccionado);
 
     if (!event) {
@@ -528,6 +578,9 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
     }
     this.estadoSeleccionado = idEstado;
     this.paginaActual = 1;
+    this.panelEstadoService.actualizarEstado(idEstado);
+    this.panelEstadoService.actualizarPagina(1);
+    this.sincronizarQueryParams();
     this.cargarReportes(this.categoriaSeleccionada, idEstado);
   }
 
@@ -556,8 +609,44 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
     this.categoriaSeleccionada = 'Todos';
     this.estadoSeleccionado = null;
     this.paginaActual = 1;
+    this.panelEstadoService.restablecerFiltros();
+    this.sincronizarQueryParams();
     this.actualizarIndicador();
     this.cargarReportes('Todos', null);
+  }
+
+  /**
+   * Refleja de forma sutil y sin recargas los filtros y paginación actuales en los queryParams de la URL.
+   */
+  private sincronizarQueryParams(): void {
+    const queryParams: Record<string, string | number | null> = {};
+    if (this.categoriaSeleccionada && this.categoriaSeleccionada !== 'Todos') {
+      queryParams['categoria'] = this.categoriaSeleccionada;
+    } else {
+      queryParams['categoria'] = null;
+    }
+    if (this.estadoSeleccionado !== null) {
+      queryParams['estado'] = this.estadoSeleccionado;
+    } else {
+      queryParams['estado'] = null;
+    }
+    if (this.paginaActual > 1) {
+      queryParams['pagina'] = this.paginaActual;
+    } else {
+      queryParams['pagina'] = null;
+    }
+    if (this.tamanoPagina !== 10) {
+      queryParams['tamano'] = this.tamanoPagina;
+    } else {
+      queryParams['tamano'] = null;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   /**

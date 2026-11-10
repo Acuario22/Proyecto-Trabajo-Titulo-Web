@@ -4,10 +4,12 @@ import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { PanelAdministrativoComponent } from './panel-administrativo';
 import { ReporteService } from '../../core/services/reporte.service';
+import { PanelEstadoService } from '../../core/services/panel-estado.service';
 
 describe('PanelAdministrativoComponent', () => {
   let component: PanelAdministrativoComponent;
   let fixture: ComponentFixture<PanelAdministrativoComponent>;
+  let panelEstadoService: PanelEstadoService;
 
   const reporteServiceMock = {
     obtenerCategorias: () => of([
@@ -22,6 +24,10 @@ describe('PanelAdministrativoComponent', () => {
   };
 
   beforeEach(async () => {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.clear();
+    }
+
     await TestBed.configureTestingModule({
       imports: [PanelAdministrativoComponent],
       providers: [
@@ -29,6 +35,9 @@ describe('PanelAdministrativoComponent', () => {
         { provide: ReporteService, useValue: reporteServiceMock }
       ]
     }).compileComponents();
+
+    panelEstadoService = TestBed.inject(PanelEstadoService);
+    panelEstadoService.reiniciar();
 
     fixture = TestBed.createComponent(PanelAdministrativoComponent);
     component = fixture.componentInstance;
@@ -160,5 +169,36 @@ describe('PanelAdministrativoComponent', () => {
     expect(component.paginaActual).toBe(1);
     expect(component.totalPaginas).toBe(2);
     expect(component.reportesPaginados.length).toBe(20);
+  });
+
+  it('should persist category, status and page into PanelEstadoService upon selection', () => {
+    component.seleccionarCategoria('Alcantarillado');
+    expect(component.categoriaSeleccionada).toBe('Alcantarillado');
+
+    component.seleccionarEstado(2);
+    expect(component.estadoSeleccionado).toBe(2);
+
+    // Simular reportes para tener 3 páginas disponibles
+    component.reportes = Array.from({ length: 30 }, (_, i) => ({
+      id: i + 1,
+      codigo: `RPT-2026-000${i + 1}`,
+      texto: `Reporte ${i + 1}`,
+      direccion: 'Calle Test',
+      categoria: 'Alcantarillado',
+      fechaIngreso: '2026-10-30T00:00:00',
+      urgencia: 'Baja',
+      estado: 'Iniciado',
+      sentimiento: 'Neutro',
+      nivelRiesgo: 'NINGUNO',
+      huboAjuste: false
+    }));
+
+    component.cambiarPagina(3);
+    expect(component.paginaActual).toBe(3);
+
+    component.restablecerFiltros();
+    expect(component.categoriaSeleccionada).toBe('Todos');
+    expect(component.estadoSeleccionado).toBe(null);
+    expect(component.paginaActual).toBe(1);
   });
 });

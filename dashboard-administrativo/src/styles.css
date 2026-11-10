@@ -1044,37 +1044,47 @@ body.dark-mode {
 }
 
 /* ==========================================================================
-   9.1 TRANSICIÓN FLUIDA Y CINEMATOGRÁFICA ENTRE TEMAS (COLOR MORPH)
-   Se activa únicamente durante el cambio de tema para interpolar fondos,
-   textos, bordes y sombras con suavidad, liberando los micro-eventos de
-   la interfaz una vez concluida la transición (500ms).
+   9.1 TRANSICIÓN DE ALTO RENDIMIENTO ENTRE TEMAS (ZERO-LAG COLOR MORPH)
+   Se enfoca exclusivamente en superficies estructurales clave para garantizar
+   60 FPS estables sin saturar el hilo de renderizado con box-shadows o
+   interpolaciones de color sobre miles de nodos DOM.
    ========================================================================== */
 html.theme-transitioning,
-html.theme-transitioning *:not(.theme-switch):not(.theme-switch *),
-html.theme-transitioning *::before,
-html.theme-transitioning *::after {
-  transition: background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              background 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              fill 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              stroke 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  transition-delay: 0s !important;
+html.theme-transitioning body {
+  transition: background-color 0.22s ease, color 0.22s ease !important;
+}
+
+html.theme-transitioning .topbar-capsule,
+html.theme-transitioning .table-card,
+html.theme-transitioning .kpi-card,
+html.theme-transitioning .tabs-wrapper,
+html.theme-transitioning .modal-card,
+html.theme-transitioning .modal-header,
+html.theme-transitioning .modal-footer,
+html.theme-transitioning .modal-chip-item,
+html.theme-transitioning .modal-text-block,
+html.theme-transitioning .report-table th,
+html.theme-transitioning .report-table td,
+html.theme-transitioning .table-footer,
+html.theme-transitioning .card-skydash,
+html.theme-transitioning .status-dropdown-trigger,
+html.theme-transitioning .auto-refresh-dropdown-trigger,
+html.theme-transitioning .btn-refresh-manual {
+  transition: background-color 0.22s ease, border-color 0.22s ease, color 0.22s ease !important;
 }
 
 /* Preservar intacta la física de resorte y deslizamiento del interruptor de tema */
 html.theme-transitioning .theme-switch {
-  transition: background-color 0.38s ease, border-color 0.38s ease, box-shadow 0.38s ease, transform 0.15s ease !important;
+  transition: background-color 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease, transform 0.15s ease !important;
 }
 
 html.theme-transitioning .switch-thumb {
-  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
-              background 0.38s ease,
-              box-shadow 0.38s ease,
-              color 0.38s ease !important;
+  transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.24s ease,
+              box-shadow 0.24s ease,
+              color 0.24s ease !important;
 }
 
 html.theme-transitioning .thumb-svg {
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
