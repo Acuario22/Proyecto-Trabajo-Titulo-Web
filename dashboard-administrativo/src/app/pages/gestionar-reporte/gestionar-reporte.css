@@ -1015,11 +1015,6 @@
     align-items: center;
 }
 
-.footer-note {
-    font-size: var(--tamano-fuente-s);
-    color: var(--color-texto-atenuado);
-}
-
 .footer-buttons {
     display: flex;
     align-items: center;

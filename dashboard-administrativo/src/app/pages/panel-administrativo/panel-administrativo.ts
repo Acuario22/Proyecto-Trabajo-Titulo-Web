@@ -53,10 +53,6 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
   indicadorWidth: number = 0;
   indicadorVisible: boolean = false;
 
-  // Listas oficiales de Urgencias y Sentimientos
-  readonly urgencias = URGENCIAS;
-  readonly sentimientos = SENTIMIENTOS;
-
   // Pestaña seleccionada actualmente ('Todos' por defecto)
   categoriaSeleccionada: string = 'Todos';
 
@@ -90,6 +86,7 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
   // Lista de reportes obtenidos de la base de datos
   reportes: Reporte[] = [];
   cargandoReportes: boolean = true;
+  readonly skeletonFilas: number[] = [1, 2, 3, 4, 5];
   errorReportes: string | null = null;
 
   // ==========================================
@@ -393,29 +390,11 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
   }
 
   /**
-   * Helper que retorna la etiqueta completa del intervalo actual.
-   */
-  obtenerEtiquetaIntervaloActual(): string {
-    const encontrado = this.opcionesIntervalo.find(o => o.valor === this.intervaloSeleccionado);
-    return encontrado ? encontrado.etiqueta : 'Cada 1 min';
-  }
-
-  /**
    * Helper que retorna el nombre corto para el botón disparador del desplegable de recarga.
    */
   obtenerEtiquetaIntervaloCorto(): string {
     const encontrado = this.opcionesIntervalo.find(o => o.valor === this.intervaloSeleccionado);
     return encontrado ? encontrado.corto : '1 min';
-  }
-
-  /**
-   * Manejador del evento change en el selector HTML de intervalos.
-   */
-  onCambiarIntervaloSelect(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    if (select) {
-      this.cambiarIntervalo(parseInt(select.value, 10));
-    }
   }
 
   /**
@@ -701,22 +680,6 @@ export class PanelAdministrativoComponent implements OnInit, OnDestroy, AfterVie
       return 'estado-proceso';
     }
     return 'estado-pendiente';
-  }
-
-  obtenerClaseRiesgo(riesgo?: string): string {
-    const r = (riesgo || '').toUpperCase().trim();
-    switch (r) {
-      case 'CRITICO':
-        return 'riesgo-critico';
-      case 'ALTO':
-        return 'riesgo-alto';
-      case 'MEDIO':
-        return 'riesgo-medio';
-      case 'BAJO':
-        return 'riesgo-bajo';
-      default:
-        return 'riesgo-ninguno';
-    }
   }
 
   /**

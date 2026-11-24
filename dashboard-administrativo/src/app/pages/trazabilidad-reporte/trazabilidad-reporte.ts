@@ -1,8 +1,9 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Urgencia, Sentimiento, URGENCIAS, SENTIMIENTOS } from '../panel-administrativo/panel-administrativo';
+import { Urgencia, Sentimiento } from '../panel-administrativo/panel-administrativo';
 import { ReporteService } from '../../core/services/reporte.service';
+import { NotificacionService } from '../../core/services/notificacion.service';
 import { HeaderComponent } from '../../shared/components/header/header';
 
 export interface PasoLineaTiempo {
@@ -36,10 +37,8 @@ export class TrazabilidadReporteComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private reporteService = inject(ReporteService);
+  private notificacionService = inject(NotificacionService);
   private cdr = inject(ChangeDetectorRef);
-
-  readonly urgencias = URGENCIAS;
-  readonly sentimientos = SENTIMIENTOS;
 
   idReporte: number | string | null = null;
   cargando: boolean = true;
@@ -164,8 +163,16 @@ export class TrazabilidadReporteComponent implements OnInit {
   }
 
   verEnMapa(): void {
-    const dir = encodeURIComponent(this.reporte.direccion || 'Municipalidad');
-    window.open(`https://www.google.com/maps/search/?api=1&query=${dir}`, '_blank');
+    const direccion = this.reporte.direccion?.trim();
+    if (direccion && direccion.toLowerCase() !== 'no especificada') {
+      const dir = encodeURIComponent(direccion);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${dir}`, '_blank');
+    } else {
+      this.notificacionService.info(
+        'Sin dirección',
+        'Este reporte no registra una dirección específica.'
+      );
+    }
   }
 
   volverAlPanel(): void {

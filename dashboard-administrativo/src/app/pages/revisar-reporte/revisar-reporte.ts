@@ -114,12 +114,6 @@ export class RevisarReporteComponent implements OnInit {
     });
   }
 
-  get formularioValido(): boolean {
-    return this.checkInstruccionesConformes &&
-      this.checkEvidenciasVerificadas &&
-      this.observacionCierreAdmin.trim().length > 0;
-  }
-
   async finalizarReporte(): Promise<void> {
     if (!this.checkInstruccionesConformes || !this.checkEvidenciasVerificadas) {
       this.intentadoFinalizar = true;
@@ -201,13 +195,14 @@ export class RevisarReporteComponent implements OnInit {
   }
 
   verEnMapa(): void {
-    if (this.reporte.direccion && this.reporte.direccion.trim()) {
-      const dir = encodeURIComponent(this.reporte.direccion.trim());
+    const direccion = this.reporte.direccion?.trim();
+    if (direccion && direccion.toLowerCase() !== 'no especificada') {
+      const dir = encodeURIComponent(direccion);
       window.open(`https://www.google.com/maps/search/?api=1&query=${dir}`, '_blank');
     } else {
       this.notificacionService.info(
         'Sin dirección',
-        'Este reporte no registra una dirección en la base de datos.'
+        'Este reporte no registra una dirección específica.'
       );
     }
   }

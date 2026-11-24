@@ -19,8 +19,6 @@ export class HeaderComponent {
   @Input() mostrarVolver: boolean = false;
   @Input() textoVolver: string = 'Volver al panel';
   @Input() rutaVolver: string = '/';
-  @Input() mostrarEstado: boolean = false;
-  @Input() textoEstado: string = 'Sistema activo';
   @Input() perfilTexto: string = 'Perfil administrador';
   @Input() mostrarPerfil: boolean = true;
   @Input() mostrarIconoMunicipalidad: boolean = true;

@@ -15,9 +15,17 @@
         <nav class="tabs-wrapper" #tabsWrapper>
             <!-- Pastilla indicadora deslizante (Sliding Pill tipo Toggle) -->
             <div class="tab-indicator" [style.transform]="'translateX(' + indicadorLeft + 'px)'"
-                [style.width.px]="indicadorWidth" [class.visible]="indicadorVisible" aria-hidden="true">
+                [style.width.px]="indicadorWidth" [class.visible]="indicadorVisible && !cargandoCategorias" aria-hidden="true">
             </div>
 
+            @if (cargandoCategorias && categorias.length === 0) {
+            <div class="skeleton-tabs-row" aria-hidden="true">
+                <span class="skeleton-shimmer skeleton-tab-pill" style="width: 82px;"></span>
+                <span class="skeleton-shimmer skeleton-tab-pill" style="width: 124px;"></span>
+                <span class="skeleton-shimmer skeleton-tab-pill" style="width: 132px;"></span>
+                <span class="skeleton-shimmer skeleton-tab-pill" style="width: 108px;"></span>
+            </div>
+            } @else {
             <!-- Pestaña TODOS -->
             <button class="tab-button" [class.active]="categoriaSeleccionada === 'Todos'"
                 (click)="seleccionarCategoria('Todos', $event)" title="Ver todos los reportes">
@@ -33,10 +41,7 @@
                 <span class="tab-badge">{{ cat.conteo }}</span>
             </button>
             } @empty {
-            @if (cargandoCategorias) {
-            <span class="tabs-loading">Cargando categorías...</span>
-            } @else {
-            <span class="tabs-loading">Sin categorías registradas</span>
+            <span class="tabs-empty">Sin categorías registradas</span>
             }
             }
         </nav>
@@ -170,7 +175,11 @@
             <div class="kpi-left">
                 <div class="kpi-indicator"></div>
                 <div class="kpi-data">
+                    @if (cargandoMetricas) {
+                    <span class="skeleton-shimmer skeleton-kpi-num"></span>
+                    } @else {
                     <span class="kpi-value">{{ metricas.totalReportes }}</span>
+                    }
                     <span class="kpi-label">Total Reportes</span>
                 </div>
             </div>
@@ -190,7 +199,11 @@
             <div class="kpi-left">
                 <div class="kpi-indicator"></div>
                 <div class="kpi-data">
+                    @if (cargandoMetricas) {
+                    <span class="skeleton-shimmer skeleton-kpi-num"></span>
+                    } @else {
                     <span class="kpi-value">{{ metricas.urgenciaAlta }}</span>
+                    }
                     <span class="kpi-label">Urgencia Alta</span>
                 </div>
             </div>
@@ -209,7 +222,11 @@
             <div class="kpi-left">
                 <div class="kpi-indicator"></div>
                 <div class="kpi-data">
+                    @if (cargandoMetricas) {
+                    <span class="skeleton-shimmer skeleton-kpi-num"></span>
+                    } @else {
                     <span class="kpi-value">{{ metricas.finalizados }}</span>
+                    }
                     <span class="kpi-label">Finalizados</span>
                 </div>
             </div>
@@ -225,9 +242,6 @@
 
     <!-- Tabla de Reportes Simplificada y Limpia (7 Columnas de Identificación Inmediata) -->
     <section class="table-card">
-        <!-- Barra de progreso superior elegante durante la carga o cambio de categoría -->
-        <div class="table-loading-bar" [class.active]="cargandoReportes" aria-hidden="true"></div>
-
         <div class="table-responsive">
             <table class="report-table">
                 <thead>
@@ -241,21 +255,60 @@
                         <th class="col-accion">ACCIÓN</th>
                     </tr>
                 </thead>
-                <tbody [class.is-loading]="cargandoReportes && reportes.length > 0">
-                    @if (cargandoReportes && reportes.length === 0) {
-                    <tr>
-                        <td colspan="7" class="table-state-cell">
-                            <div class="state-wrapper">
-                                <span class="spinner"></span>
-                                <span>Cargando reportes desde la base de datos...</span>
+                <tbody>
+                    @if (cargandoReportes) {
+                    @for (s of skeletonFilas; track s) {
+                    <tr class="skeleton-row" aria-hidden="true">
+                        <!-- Columna 1: ESTADO -->
+                        <td class="col-estado">
+                            <div class="skeleton-shimmer skeleton-badge"></div>
+                        </td>
+
+                        <!-- Columna 2: CÓDIGO -->
+                        <td class="col-codigo">
+                            <div class="skeleton-shimmer skeleton-code"></div>
+                        </td>
+
+                        <!-- Columna 3: DESCRIPCIÓN -->
+                        <td class="col-descripcion">
+                            <div class="skeleton-desc-block">
+                                <div class="skeleton-shimmer skeleton-line" [style.width]="(s % 2 === 0 ? '88%' : '76%')"></div>
+                                <div class="skeleton-shimmer skeleton-line skeleton-line-sub" [style.width]="(s % 2 === 0 ? '54%' : '44%')"></div>
+                            </div>
+                        </td>
+
+                        <!-- Columna 4: DIRECCIÓN -->
+                        <td class="col-direccion">
+                            <div class="skeleton-dir-block">
+                                <div class="skeleton-shimmer skeleton-dot-sm"></div>
+                                <div class="skeleton-shimmer skeleton-line" [style.width]="(s % 2 === 0 ? '70%' : '82%')"></div>
+                            </div>
+                        </td>
+
+                        <!-- Columna 5: CATEGORÍA -->
+                        <td class="col-categoria">
+                            <div class="skeleton-shimmer skeleton-pill"></div>
+                        </td>
+
+                        <!-- Columna 6: URGENCIA -->
+                        <td class="col-urgencia">
+                            <div class="skeleton-shimmer skeleton-urgency"></div>
+                        </td>
+
+                        <!-- Columna 7: ACCIÓN -->
+                        <td class="col-accion action-cell">
+                            <div class="action-buttons-group">
+                                <div class="skeleton-shimmer skeleton-btn-action"></div>
+                                <div class="skeleton-shimmer skeleton-btn-action"></div>
                             </div>
                         </td>
                     </tr>
+                    }
                     } @else if (errorReportes && reportes.length === 0) {
                     <tr>
                         <td colspan="7" class="table-state-cell">
                             <div class="state-wrapper error-state">
-                                <span>⚠️ {{ errorReportes }}</span>
+                                <span>{{ errorReportes }}</span>
                                 <button class="btn-retry"
                                     (click)="cargarReportes(categoriaSeleccionada, estadoSeleccionado)">Reintentar</button>
                             </div>
@@ -393,7 +446,7 @@
         <footer class="table-footer">
             <div class="pagination-info">
                 @if (cargandoReportes) {
-                <span class="pagination-summary">Consultando datos...</span>
+                <span class="skeleton-shimmer skeleton-pagination-info"></span>
                 } @else if (reportes.length === 0) {
                 <span class="pagination-summary">0 reportes registrados</span>
                 } @else {

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificacionService, ToastNotificacion, ConfirmModalState } from '../../../core/services/notificacion.service';
+import { NotificacionService } from '../../../core/services/notificacion.service';
 
 @Component({
   selector: 'app-notificacion-host',

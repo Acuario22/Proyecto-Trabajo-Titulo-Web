@@ -549,13 +549,14 @@ export class GestionarReporteComponent implements OnInit {
   }
 
   verEnMapa(): void {
-    if (this.reporte.direccion && this.reporte.direccion.trim()) {
-      const direccionCodificada = encodeURIComponent(this.reporte.direccion.trim());
+    const direccion = this.reporte.direccion?.trim();
+    if (direccion && direccion.toLowerCase() !== 'no especificada') {
+      const direccionCodificada = encodeURIComponent(direccion);
       window.open(`https://www.google.com/maps/search/?api=1&query=${direccionCodificada}`, '_blank');
     } else {
       this.notificacionService.info(
         'Sin dirección',
-        'Este reporte no registra una dirección en la base de datos.'
+        'Este reporte no registra una dirección específica.'
       );
     }
   }

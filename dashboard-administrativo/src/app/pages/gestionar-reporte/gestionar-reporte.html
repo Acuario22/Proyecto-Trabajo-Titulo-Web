@@ -33,6 +33,90 @@
   }
 
   <!-- Encabezado de Página -->
+  @if (cargandoReporte) {
+    <!-- SKELETON LOADER PARA GESTIONAR REPORTE -->
+    <section class="page-heading" aria-hidden="true">
+      <div class="page-heading-left">
+        <div class="skeleton-shimmer skeleton-title" style="width: 240px; margin-bottom: 8px;"></div>
+        <div class="skeleton-shimmer skeleton-line" style="width: 380px;"></div>
+      </div>
+      <div class="page-heading-right">
+        <div class="skeleton-shimmer skeleton-badge" style="width: 140px; height: 36px;"></div>
+      </div>
+    </section>
+
+    <div class="gestion-layout" aria-hidden="true">
+      <div class="main-column">
+        <!-- Skeleton Card: Resumen de Incidencia -->
+        <section class="incident-card">
+          <div class="incident-card-header" style="margin-bottom: 1.25rem;">
+            <div class="incident-tags" style="gap: 8px; display: flex;">
+              <div class="skeleton-shimmer skeleton-badge" style="width: 110px;"></div>
+              <div class="skeleton-shimmer skeleton-badge" style="width: 95px;"></div>
+              <div class="skeleton-shimmer skeleton-badge" style="width: 85px;"></div>
+            </div>
+          </div>
+          <div class="skeleton-shimmer skeleton-title" style="width: 50%; margin-bottom: 12px; height: 20px;"></div>
+          <div class="skeleton-shimmer skeleton-line" style="width: 100%; margin-bottom: 8px;"></div>
+          <div class="skeleton-shimmer skeleton-line" style="width: 80%; margin-bottom: 1.25rem;"></div>
+          <div style="display: flex; gap: 1.5rem;">
+            <div class="skeleton-shimmer skeleton-line" style="width: 45%;"></div>
+            <div class="skeleton-shimmer skeleton-line" style="width: 35%;"></div>
+          </div>
+        </section>
+
+        <!-- Skeleton Card: Formulario de Orden de Trabajo -->
+        <section class="work-order-card">
+          <div class="work-order-header" style="margin-bottom: 1.5rem;">
+            <div class="skeleton-shimmer skeleton-title" style="width: 280px; height: 22px; margin-bottom: 8px;"></div>
+            <div class="skeleton-shimmer skeleton-line" style="width: 420px;"></div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+            <div>
+              <div class="skeleton-shimmer skeleton-line" style="width: 120px; margin-bottom: 8px;"></div>
+              <div class="skeleton-shimmer skeleton-input-box"></div>
+            </div>
+            <div>
+              <div class="skeleton-shimmer skeleton-line" style="width: 140px; margin-bottom: 8px;"></div>
+              <div class="skeleton-shimmer skeleton-input-box"></div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+            <div>
+              <div class="skeleton-shimmer skeleton-line" style="width: 130px; margin-bottom: 8px;"></div>
+              <div class="skeleton-shimmer skeleton-input-box"></div>
+            </div>
+            <div>
+              <div class="skeleton-shimmer skeleton-line" style="width: 110px; margin-bottom: 8px;"></div>
+              <div class="skeleton-shimmer skeleton-input-box"></div>
+            </div>
+          </div>
+          <div style="margin-bottom: 1.25rem;">
+            <div class="skeleton-shimmer skeleton-line" style="width: 160px; margin-bottom: 8px;"></div>
+            <div class="skeleton-shimmer skeleton-textarea-box"></div>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+            <div class="skeleton-shimmer skeleton-btn-pill" style="width: 110px;"></div>
+            <div class="skeleton-shimmer skeleton-btn-pill" style="width: 180px;"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Skeleton Sidebar -->
+      <aside class="sidebar-column">
+        <section class="sidebar-card">
+          <div class="skeleton-shimmer skeleton-title" style="width: 75%; height: 20px; margin-bottom: 8px;"></div>
+          <div class="skeleton-shimmer skeleton-line" style="width: 90%; margin-bottom: 1.5rem;"></div>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="skeleton-shimmer" style="height: 60px; border-radius: 12px; width: 100%;"></div>
+            <div class="skeleton-shimmer" style="height: 60px; border-radius: 12px; width: 100%;"></div>
+            <div class="skeleton-shimmer" style="height: 60px; border-radius: 12px; width: 100%;"></div>
+            <div class="skeleton-shimmer" style="height: 70px; border-radius: 12px; width: 100%;"></div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  } @else {
   <section class="page-heading">
     <div class="page-heading-left">
       <h2 class="page-main-title">Gestionar reporte</h2>
@@ -473,5 +557,6 @@
     </aside>
 
   </div>
+  }
 
 </main>

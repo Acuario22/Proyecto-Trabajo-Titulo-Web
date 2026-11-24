@@ -10,8 +10,10 @@ import lombok.NoArgsConstructor;
 /**
  * DTO para la creación de un nuevo reporte ciudadano.
  * El ciudadano solo necesita enviar 'textoReporte' y 'direccion'.
- * La categoría es clasificada automáticamente por el microservicio de Machine Learning,
- * y los campos restantes (sentimiento, urgencia, riesgo) son gestionados por el backend.
+ * La categoría es clasificada automáticamente por el microservicio de Machine
+ * Learning,
+ * y los campos restantes (sentimiento, urgencia, riesgo) son gestionados por el
+ * backend.
  */
 @Data
 @NoArgsConstructor
@@ -24,11 +26,11 @@ public class CrearReporteRequestDTO {
     @Schema(description = "Descripción del problema reportado por el ciudadano", example = "Se observa rotura de matriz de agua con fuga constante en plena vereda.")
     private String textoReporte;
 
-    @NotBlank(message = "La dirección no puede estar vacía")
-    @Schema(description = "Dirección o ubicación geográfica del incidente", example = "Av. Libertad con Calle 5")
+    @Schema(description = "Dirección o ubicación geográfica del incidente (opcional; si se omite o viene vacía se asigna 'No especificada')", example = "Av. Libertad con Calle 5", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
     private String direccion;
 
-    // Campos secundarios opcionales (ocultos en la plantilla de Swagger para que el usuario solo envíe texto y dirección)
+    // Campos secundarios opcionales (ocultos en la plantilla de Swagger para que el
+    // usuario solo envíe texto y dirección)
     @Schema(hidden = true)
     private Integer idCategoria;
 

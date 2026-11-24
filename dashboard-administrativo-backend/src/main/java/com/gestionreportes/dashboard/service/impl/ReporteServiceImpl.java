@@ -36,6 +36,7 @@ public class ReporteServiceImpl implements ReporteService {
         private final MlInferenceService mlInferenceService;
 
         private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        private static final String DIRECCION_NO_ESPECIFICADA = "No especificada";
 
         @Override
         public List<ReporteDTO> listarReportes(String categoria) {
@@ -151,7 +152,7 @@ public class ReporteServiceImpl implements ReporteService {
                                 .codigo(formatearCodigo(reporte))
                                 .titulo("Reporte de " + categoriaFormateada)
                                 .descripcion(reporte.getTextoReporte())
-                                .direccion(reporte.getDireccion())
+                                .direccion(normalizarDireccion(reporte.getDireccion()))
                                 .fechaIngreso(reporte.getFechaIngreso().format(DATE_FORMATTER))
                                 .urgencia(reporte.getUrgenciaFinal() != null
                                                 ? formatearCapital(reporte.getUrgenciaFinal().getNombre())
@@ -266,7 +267,7 @@ public class ReporteServiceImpl implements ReporteService {
                 Reporte nuevoReporte = Reporte.builder()
                                 .fechaIngreso(LocalDateTime.now())
                                 .textoReporte(request.getTextoReporte())
-                                .direccion(request.getDireccion())
+                                .direccion(normalizarDireccion(request.getDireccion()))
                                 .categoria(categoria)
                                 .sentimiento(sentimiento)
                                 .urgenciaMl(urgenciaMl)
@@ -548,7 +549,7 @@ public class ReporteServiceImpl implements ReporteService {
                                                 ? formatearCapital(reporte.getCategoria().getNombre())
                                                 : "Sin Categoría")
                                 .texto(reporte.getTextoReporte())
-                                .direccion(reporte.getDireccion())
+                                .direccion(normalizarDireccion(reporte.getDireccion()))
                                 .fechaIngreso(reporte.getFechaIngreso().format(DATE_FORMATTER))
                                 .urgencia(reporte.getUrgenciaFinal() != null
                                                 ? formatearCapital(reporte.getUrgenciaFinal().getNombre())
@@ -612,11 +613,15 @@ public class ReporteServiceImpl implements ReporteService {
         }
 
         /**
-         * Sobrecarga de compatibilidad para identificadores numéricos.
+         * Normaliza la dirección del reporte. Si es nula o está vacía/en blanco,
+         * retorna "No especificada".
          *
-         * @param id Identificador numérico del reporte
-         * @return Código formateado con año actual como salvaguarda (ej. RPT-2026-0005)
+         * @param direccion Dirección recibida o almacenada
+         * @return Dirección normalizada
          */
+        private String normalizarDireccion(String direccion) {
+                return (direccion == null || direccion.isBlank()) ? DIRECCION_NO_ESPECIFICADA : direccion.trim();
+        }
 
         private String formatearCapital(String texto) {
                 if (texto == null || texto.isEmpty())
