@@ -1,0 +1,16 @@
+# Variables de entorno y secretos
+.env
+.env.*
+
+# Carpetas temporales / estado local
+state/
+**/state/
+
+# Configuración local de IDE
+.vscode/settings.json
+
+# Respaldos, logs y archivos de sistema
+*.bak
+*.log
+.DS_Store
+Thumbs.db
